@@ -14,7 +14,7 @@ const teacherschema=mongoose.Schema({
         required:true
     },
     phno:{
-        type:Number,
+        type:String,
         required:true
     },
     teacher_id:{
@@ -40,6 +40,9 @@ const teacherschema=mongoose.Schema({
     resend_otp_expiry_time:{
         type:Number,
         default:0
+    },
+    profile:{
+        type:String
     }
 
 })

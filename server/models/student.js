@@ -49,7 +49,11 @@ const studentschema=mongoose.Schema({
     resend_otp_expiry_time:{
         type:Number,
         default:0
+    },
+    profile:{
+        type:String
     }
+
 })
 
 const studentmodel=mongoose.model('students',studentschema)

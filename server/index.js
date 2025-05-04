@@ -3,12 +3,15 @@ import dotenv from 'dotenv'
 import mongodb from './db.js'
 import cors from 'cors';
 
+
+
 import studentrouter from './routers/studentrouter.js'
 import cookieParser from 'cookie-parser'
 import { POST_ID } from './controllers/teacher_idcontroller.js'
 import teacherrouter from './routers/teacherrouter.js'
 import classrouter from './routers/classrouter.js'
 import attendencerouter from './routers/attendencerouter.js'
+import adminrouter from './routers/adminrouter.js';
 
 const app=express()
 dotenv.config()
@@ -34,6 +37,7 @@ app.post('/api/teacher_id',POST_ID);
 app.use('/api/authteacher',teacherrouter);
 app.use('/api/class',classrouter);
 app.use('/api/attendence',attendencerouter);
+app.use('/api/admin',adminrouter)
 
 mongodb();
 const port=process.env.PORT || 8080;

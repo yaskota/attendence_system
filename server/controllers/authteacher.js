@@ -4,6 +4,7 @@ import teacher_idmodel from '../models/teacher_id.js';
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs';
 import transporter from '../nodemail.js'
+import cloudinary from "../cloudinary.js";
 
 export const register=async(req,res)=>{
     const {name,email,password,phno,teacher_id}=req.body;
@@ -17,7 +18,7 @@ export const register=async(req,res)=>{
         const userteacher=await teacher_idmodel.findOne({id:teacher_id});
         if(!userteacher)
         {
-            return res.status(400).send({message:"you are not a teacher"});
+            return res.status(400).send({message:"you are not a staff"});
         }
         
         const user =await teachermodel.findOne({teacher_id});
@@ -27,11 +28,18 @@ export const register=async(req,res)=>{
         }
 
         const hashpassword=await bcrypt.hash(password,10);
+
+        const otp=String(Math.floor(10000+Math.random()*90000))
+
+
+        
         
         const newteacher={
             name,email,
             password:hashpassword,
-            phno,teacher_id
+            phno,teacher_id,
+            otp:otp,
+            otp_expiry_time:Date.now()+24*60*60*1000
         }
 
         const User=new teachermodel(newteacher);
@@ -50,7 +58,7 @@ export const register=async(req,res)=>{
             from:process.env.SENDER_EMAIL,
             to:email,
             subject:"welcome to JNTU sulthanpur",
-            text:`Welcome to JNTU sulthanpur your account has been created by email id ${email}`
+            text:`Welcome to JNTU sulthanpur your account has been created by email id ${email} and verify user with otp : ${otp}`
         }
 
         await transporter.sendMail(verificationMail);
@@ -75,6 +83,7 @@ export const login=async(req,res)=>{
             return res.status(400).send({message:"email Not exist"});
         }
 
+
         const check=await bcrypt.compare(password,user.password);
         if(!check)
         {
@@ -90,7 +99,7 @@ export const login=async(req,res)=>{
             maxAge :7*24*60*60*1000
         })
 
-        return res.status(200).send({message:"Login succesfully"});
+        return res.status(200).send({message:"Login succesfully",userRole:"faculty",user});
 
 
     } catch (error) {
@@ -242,12 +251,13 @@ export const resetpassword=async(req,res)=>{
         return res.status(404).send({message:"Data missing"})
     }
     try {
-        
+        console.log("aa")
         const user=await teachermodel.findOne({email});
         if(!user)
         {
             return res.status(404).send({message:"user not found"})
         }
+        console.log("bb")
         if(user.resendotp=="" || user.resendotp!==otp)
         {
             return res.status(401).send({message:"otp incorrect"})
@@ -270,3 +280,51 @@ export const resetpassword=async(req,res)=>{
         return res.send(400).send({message:"error in passreset",error})
     }
 }
+export const profileupdate= async (req,res)=>{
+    const {USER_ID}=req.body;
+    if(!USER_ID)
+    {
+      return res.status(400).send({message:"user id not found"})
+    }
+    const user=await teachermodel.findById(USER_ID);
+    if(!user)
+    {
+      return res.status(401).send({message:"user not found"})
+    }
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { folder: "myApp" },
+      async (error, result) => {
+        if (error) return res.status(500).json({ error });
+
+        
+        user.profile=result.secure_url;
+
+        await user.save();
+        res.status(200).json(user);
+      }
+    );
+
+    uploadStream.end(req.file.buffer);
+    try {
+      
+    } catch (error) {
+      return res.status(400).send({message:"error occur in profile update"});
+    }
+}
+
+export const teacherdetails=async(req,res)=>{
+    const {USER_ID}=req.body
+    try {
+        if (!USER_ID) {
+            return res.status(400).send({ message: "User ID not found" });
+          }
+      
+          const user = await teachermodel.findById(USER_ID);
+          if (!user) {
+            return res.status(404).send({ message: "User not found" });
+          }
+          res.status(200).send(user)
+    } catch (error) {
+        console.log('error occur in get student details')
+    }
+  }

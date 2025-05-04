@@ -7,6 +7,6 @@ const classrouter=express.Router()
 classrouter.post('/create', userAuth, create);
 classrouter.get('/gather',userAuth,gather);
 classrouter.delete('/delete/:id',Delete);
-classrouter.patch('/update/:id',Update);
+classrouter.post('/update/:id',Update);
 
 export default classrouter;

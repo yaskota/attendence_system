@@ -1,19 +1,36 @@
 import express from 'express'
 import classmodel from '../models/class.js'
+import studentmodel from '../models/student.js';
 
 export const create=async(req,res)=>{
-    const {subject,year,hour,branch,USER_ID}=req.body;
+    const {subject,start_year,branch,USER_ID}=req.body;
 
-    if(!subject || !year || !hour || !branch || !USER_ID)
+    if(!subject || !start_year  || !branch || !USER_ID)
     {
         return res.status(400).send({message:"class details not found"})
     }
     try {
 
+        const year=await studentmodel.findOne({start_year,branch});
+        if(!year)
+        {
+            return res.status(400).send({message:"students are not there"})
+        }
+
+        const user=await classmodel.findOne(
+            {subject,
+            start_year,
+            
+            branch,
+            teacherId:USER_ID})
+        if(user)
+        {
+            return res.status(400).send({message:"It is already exist"})
+        }
         const classroom={
             subject,
-            year,
-            hour,
+            start_year,
+            
             branch,
             teacherId:USER_ID
         };
@@ -71,15 +88,15 @@ export const Update=async(req,res)=>{
 
     try {
         const id=req.params.id;
-        const {subject,year,hour,branch}=req.body;
-        if(!subject || !year || !hour || !branch )
+        const {subject,start_year,branch}=req.body;
+        if(!subject || !start_year || !branch )
         {
             return res.status(400).send({message:"class details not found"});
         }
         const user=await classmodel.findByIdAndUpdate(
             id,
             {
-                subject,year,hour,branch
+                subject,start_year,branch
             }
         )
         if(!user)

@@ -6,14 +6,11 @@ const classSchema=new mongoose.Schema({
         type:String,
         required:true
     },
-    year:{
+    start_year:{
         type:String,
         required:true
     },
-    hour:{
-        type:Number,
-        required:true
-    },
+    
     branch:{
         type:String,
         required:true
@@ -22,7 +19,8 @@ const classSchema=new mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:'teacher',
         required:true
-    }
+    },
+    
     
 })
 const classmodel=mongoose.model('class',classSchema);
