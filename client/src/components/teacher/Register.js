@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import { FaUser, FaEnvelope, FaLock, FaPhone, FaIdBadge } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-
+import { ToastContainer, toast } from "react-toastify";
 
 function Register() {
   const navigate=useNavigate()
@@ -27,15 +27,19 @@ function Register() {
         withCredentials: true
       })
       console.log("cc")
-      console.log(res.data.message);
+      toast.success(res.data.message);
       setTimeout(() => {
         navigate('/teacherotp')
       }, 2000);
     } catch (error) {
-      console.log("Error occurred in teacher register", error);
       if (error.response) {
-        console.log("Response error:", error.response.data);
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("something went wrong");
       }
+      console.log("error occur in the deleting student data");
+
+
     }
     
     // Add your register API logic here!
@@ -137,6 +141,7 @@ function Register() {
         </p>
 
       </div>
+      <ToastContainer /> 
     </div>
   );
 }

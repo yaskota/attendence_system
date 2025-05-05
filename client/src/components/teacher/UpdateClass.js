@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from "react-toastify";
 
 function UpdateClass() {
   const [subjectName, setSubjectName] = useState('');
@@ -29,15 +30,19 @@ function UpdateClass() {
         classdata,
         { withCredentials: true }
       );
-      console.log(res.data.message);
+      toast.success(res.data.message);
       setTimeout(() => {
         navigate('/teachermain');
       }, 2000);
     } catch (error) {
-      console.log('error occur in update');
       if (error.response) {
-        console.log(error.response.data);
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("something went wrong");
       }
+      console.log("error occur in the deleting student data");
+
+
     }
   };
 
@@ -96,6 +101,7 @@ function UpdateClass() {
           </div>
         </form>
       </div>
+      <ToastContainer /> 
     </div>
   );
 }

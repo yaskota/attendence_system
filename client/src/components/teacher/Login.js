@@ -4,6 +4,7 @@ import { FaEnvelope, FaLock } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
 import { useNavigate } from 'react-router-dom'; // 👈 import useNavigate
 import { useAuth } from '../../context/AuthContext';
+import { ToastContainer, toast } from "react-toastify";
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -20,7 +21,7 @@ function Login() {
       const res = await axios.post('http://localhost:8080/api/authteacher/login', User, {
         withCredentials: true
       })
-      console.log(res.data.message)
+      toast.success(res.data.message);
       const{userRole,user}=res.data
       setUser(user);
       setUserRole(userRole)
@@ -28,10 +29,14 @@ function Login() {
         navigate('/teachermain')
       }, 2000);
     } catch (error) {
-      console.log(error)
       if (error.response) {
-        console.log("Response error:", error.response.data);
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("something went wrong");
       }
+      console.log("error occur in the deleting student data");
+
+
     }
     
     
@@ -118,6 +123,7 @@ function Login() {
         </p>
 
       </div>
+      <ToastContainer /> 
     </div>
   );
 }

@@ -1,6 +1,7 @@
 // context/AuthContext.js
 import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
 
 const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
@@ -36,17 +37,25 @@ export const AuthProvider = ({ children }) => {
       const res=await axios.post("http://localhost:8080/api/authstudent/logout",null,{
         withCredentials: true,
       });
-      console.log(res.data)
+      toast.success(res.data.message);
       setUser(null);
       setUserRole("");
     } catch (error) {
-      console.error("Logout failed:", error);
+      if (error.response) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("something went wrong");
+      }
+      console.log("error occur in the deleting student data");
+
+
     }
   };
 
   return (
     <AuthContext.Provider value={{ user, setUser, logout, loading,userRole,setUserRole }}>
       {children}
+      <ToastContainer />
     </AuthContext.Provider>
   );
 };

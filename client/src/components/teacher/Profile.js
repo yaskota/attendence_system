@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { ToastContainer, toast } from "react-toastify";
 
 function Profile() {
   
@@ -40,10 +41,17 @@ function Profile() {
         }
       );
       console.log("Profile Updated successfully");
-      console.log(res.data.message)
+      toast.success(res.data.message);
       window.location.reload();
     } catch (error) {
-      console.log("Error occurred while updating profile image:", error);
+      if (error.response) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("something went wrong");
+      }
+      console.log("error occur in the deleting student data");
+
+
     }
   };
 
@@ -80,6 +88,7 @@ function Profile() {
           </div>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 }

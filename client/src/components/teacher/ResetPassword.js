@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from "react-toastify";
 
 function ResetPassword() {
   const navigate=useNavigate()
@@ -17,15 +18,19 @@ function ResetPassword() {
       const res = await axios.post('http://localhost:8080/api/authteacher/resetPassword', user, {
         withCredentials: true
       })
-      console.log(res.data.message);
+      toast.success(res.data.message);
       setTimeout(() => {
         navigate('/teacherlogin')
       },2000);
     } catch (error) {
-      console.log("error occur in resetpassword")
       if (error.response) {
-        console.log("Response error:", error.response.data);
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("something went wrong");
       }
+      console.log("error occur in the deleting student data");
+
+
     }
    
     // Handle reset password logic here
@@ -40,13 +45,17 @@ function ResetPassword() {
       const res = await axios.post('http://localhost:8080/api/authteacher/resendOtp', user, {
         withCredentials: true
       })
-      console.log(res.data.message)
+      toast.success(res.data.message);
       
     } catch (error) {
-      console.log("error occur in email")
       if (error.response) {
-        console.log("Response error:", error.response.data);
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("something went wrong");
       }
+      console.log("error occur in the deleting student data");
+
+
     }
   };
 
@@ -107,6 +116,7 @@ function ResetPassword() {
         </form>
 
       </div>
+      <ToastContainer /> 
     </div>
   );
 }

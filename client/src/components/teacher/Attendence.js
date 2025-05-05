@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FaIdCard } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
 
 function Attendence() {
   const [rollNo, setRollNo] = useState("");
@@ -76,13 +77,17 @@ function Attendence() {
         Data,
         { withCredentials: true }
       );
-      console.log(res.data.message);
+      toast.success(res.data.message);
       handledata();
     } catch (error) {
-      console.log("error occur in deleteattendence");
       if (error.response) {
-        console.log(error.response.data);
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("something went wrong");
       }
+      console.log("error occur in the deleting student data");
+
+
     }
   };
 
@@ -108,15 +113,19 @@ function Attendence() {
         Data,
         { withCredentials: true }
       );
-      console.log(res.data.message);
+      toast.success(res.data.message);
       setTimeout(() => {
         navigate("/teachermain");
       }, 2000);
     } catch (error) {
-      console.log("error occur in completeattendence");
       if (error.response) {
-        console.log(error.response.data);
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("something went wrong");
       }
+      console.log("error occur in the deleting student data");
+
+
     }
   };
 
@@ -295,6 +304,7 @@ function Attendence() {
           </button>
         </div>
       </div>
+      <ToastContainer /> 
     </div>
   );
 }

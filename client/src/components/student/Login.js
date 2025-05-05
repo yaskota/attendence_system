@@ -1,52 +1,61 @@
-import React, { useState } from 'react';
-import { FaEnvelope, FaLock } from 'react-icons/fa';
-import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
-import { FcGoogle } from 'react-icons/fc';
-import { useNavigate } from 'react-router-dom'; // <== import navigate
-import axios from 'axios'
-import { useAuth } from '../../context/AuthContext';
+import React, { useState } from "react";
+import { FaEnvelope, FaLock } from "react-icons/fa";
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { FcGoogle } from "react-icons/fc";
+import { useNavigate } from "react-router-dom"; // <== import navigate
+import axios from "axios";
+import { useAuth } from "../../context/AuthContext";
+import { ToastContainer, toast } from "react-toastify";
 
 function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-   const { setUser, setUserRole } = useAuth()
-  const navigate = useNavigate(); 
+  const { setUser, setUserRole } = useAuth();
+  const navigate = useNavigate();
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const User={
-        email,password
-      }
-      const res = await axios.post('http://localhost:8080/api/authstudent/login', User, {
-        withCredentials: true
-      })
-      console.log(res.data.message)
-      const{userRole,user}=res.data
+      const User = {
+        email,
+        password,
+      };
+      const res = await axios.post(
+        "http://localhost:8080/api/authstudent/login",
+        User,
+        {
+          withCredentials: true,
+        }
+      );
+      toast.success(res.data.message);
+      const { userRole, user } = res.data;
       setUser(user);
-      setUserRole(userRole)
+      setUserRole(userRole);
       setTimeout(() => {
-        navigate('/studentmain')
+        navigate("/studentmain");
       }, 2000);
     } catch (error) {
-      console.log(error)
+      if (error.response) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("something went wrong");
+      }
+      console.log("error occur in the deleting student data");
     }
-    
-   
   };
 
   const handleGoogleSignIn = () => {
-    console.log('Google Sign In Clicked');
+    console.log("Google Sign In Clicked");
     // Add Google Sign-In logic here!
   };
 
   const goToRegister = () => {
-    navigate('/studentregister'); // Navigate to register page
+    navigate("/studentregister"); // Navigate to register page
   };
 
   const goToForgotPassword = () => {
-    navigate('/studentemail'); // Navigate to forgot password page
+    navigate("/studentemail"); // Navigate to forgot password page
   };
 
   return (
@@ -57,7 +66,6 @@ function Login() {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-
           {/* Email */}
           <div className="relative">
             <FaEnvelope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -86,7 +94,11 @@ function Login() {
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer"
               onClick={() => setShowPassword(!showPassword)}
             >
-              {showPassword ? <AiFillEyeInvisible size={20} /> : <AiFillEye size={20} />}
+              {showPassword ? (
+                <AiFillEyeInvisible size={20} />
+              ) : (
+                <AiFillEye size={20} />
+              )}
             </div>
           </div>
 
@@ -108,7 +120,6 @@ function Login() {
           >
             Login
           </button>
-
         </form>
 
         {/* Divider */}
@@ -129,7 +140,7 @@ function Login() {
 
         {/* Register Link */}
         <p className="mt-6 text-center text-sm text-gray-600">
-          Don't have an account?{' '}
+          Don't have an account?{" "}
           <span
             className="text-pink-500 hover:underline cursor-pointer"
             onClick={goToRegister} // add click event
@@ -137,8 +148,8 @@ function Login() {
             Register
           </span>
         </p>
-
       </div>
+      <ToastContainer /> 
     </div>
   );
 }

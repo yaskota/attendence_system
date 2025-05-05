@@ -1,63 +1,75 @@
-import axios from 'axios';
-import React, { useState } from 'react';
-import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
-import { useLocation, useNavigate } from 'react-router-dom';
-
+import axios from "axios";
+import React, { useState } from "react";
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { useLocation, useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
 
 function ResetPassword() {
-  const navigate=useNavigate()
-  const location=useLocation()
-  const [otp, setOtp] = useState('');
-  const [newPassword, setNewPassword] = useState('');
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [otp, setOtp] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const email=location.state?.email
+  const email = location.state?.email;
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const user={
-        email,otp,password:newPassword
-      }
-      const res = await axios.post('http://localhost:8080/api/authstudent/resetPassword', user, {
-        withCredentials: true
-      })
-      console.log(res.data.message);
+      const user = {
+        email,
+        otp,
+        password: newPassword,
+      };
+      const res = await axios.post(
+        "http://localhost:8080/api/authstudent/resetPassword",
+        user,
+        {
+          withCredentials: true,
+        }
+      );
+      toast.success(res.data.message);
       setTimeout(() => {
-        navigate('/studentlogin')
-      },2000);
+        navigate("/studentlogin");
+      }, 2000);
     } catch (error) {
-      console.log("error occur in resetpassword")
+      if (error.response) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("something went wrong");
+      }
+      console.log("error occur in the deleting student data");
     }
-    
-    
+
     // Handle reset password logic here
   };
 
-  const handleResendOtp = async(e) => {
+  const handleResendOtp = async (e) => {
     e.preventDefault();
     try {
-      const user={
-        email
-      }
-      const res = await axios.post('http://localhost:8080/api/authstudent/resendOtp', user, {
-        withCredentials: true
-      })
-      console.log(res.data.message)
-      
+      const user = {
+        email,
+      };
+      const res = await axios.post(
+        "http://localhost:8080/api/authstudent/resendOtp",
+        user,
+        {
+          withCredentials: true,
+        }
+      );
+      console.log(res.data.message);
     } catch (error) {
-      console.log("error occur in resendotp")
+      console.log("error occur in resendotp");
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-300 via-pink-300 to-red-300 p-6">
       <div className="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-md">
-      <h2 className="text-4xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500 mb-10">
+        <h2 className="text-4xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500 mb-10">
           Reset Password
         </h2>
 
         <form className="space-y-6">
-
           {/* OTP Input */}
           <div className="relative">
             <input
@@ -84,7 +96,11 @@ function ResetPassword() {
               className="absolute right-3 top-3 text-gray-400 cursor-pointer"
               onClick={() => setShowPassword(!showPassword)}
             >
-              {showPassword ? <AiFillEyeInvisible size={20} /> : <AiFillEye size={20} />}
+              {showPassword ? (
+                <AiFillEyeInvisible size={20} />
+              ) : (
+                <AiFillEye size={20} />
+              )}
             </div>
           </div>
 
@@ -106,9 +122,9 @@ function ResetPassword() {
           >
             Submit
           </button>
-
         </form>
       </div>
+      <ToastContainer /> 
     </div>
   );
 }

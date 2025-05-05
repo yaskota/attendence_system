@@ -300,7 +300,7 @@ export const profileupdate= async (req,res)=>{
         user.profile=result.secure_url;
 
         await user.save();
-        res.status(200).json(user);
+        res.status(200).send({user,message:"profile update succesfully"});
       }
     );
 

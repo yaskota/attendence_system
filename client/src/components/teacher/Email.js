@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { ToastContainer, toast } from "react-toastify";
 
 function Email() {
   const [email, setEmail] = useState('');
@@ -15,15 +15,19 @@ function Email() {
       const res = await axios.post('http://localhost:8080/api/authteacher/resendOtp', user, {
         withCredentials: true
       })
-      console.log(res.data.message)
+      toast.success(res.data.message);
       setTimeout(() => {
         navigate('/teacherresetpassword',{state:{email}})
       }, 2000);
     } catch (error) {
-      console.log("error occur in email")
       if (error.response) {
-        console.log("Response error:", error.response.data);
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("something went wrong");
       }
+      console.log("error occur in the deleting student data");
+
+
     }
     
     // Handle email submission logic here
@@ -64,6 +68,7 @@ function Email() {
         </form>
 
       </div>
+      <ToastContainer />
     </div>
   );
 }
