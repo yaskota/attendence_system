@@ -28,12 +28,24 @@ import TProfile from './components/teacher/Profile.js';
 
 import { AuthProvider } from './context/AuthContext';
 
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <Header/>
-        
+        <ToastContainer 
+          position="top-center"
+          autoClose={2000}
+          hideProgressBar={false}
+          closeOnClick
+          pauseOnHover={false}
+          draggable
+          pauseOnFocusLoss={false}
+          theme="colored"
+        />
         <Routes>
           <Route path="/" element={<Home/>}/>
           <Route path="/studentregister" element={<Register/>}/>

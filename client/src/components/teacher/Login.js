@@ -1,46 +1,44 @@
 import axios from 'axios';
 import React, { useState } from 'react';
-import { FaEnvelope, FaLock } from 'react-icons/fa';
+import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa'; // 👈 Added Eye Icons
 import { FcGoogle } from 'react-icons/fc';
-import { useNavigate } from 'react-router-dom'; // 👈 import useNavigate
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate(); // 👈 create navigate
-  const { setUser, setUserRole } = useAuth()
+  const [showPassword, setShowPassword] = useState(false); // 👈 Password visibility state
+  const navigate = useNavigate();
+  const { setUser, setUserRole } = useAuth();
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const User={
-        email,password
-      }
+      const User = {
+        email,
+        password
+      };
       const res = await axios.post('http://localhost:8080/api/authteacher/login', User, {
         withCredentials: true
-      })
+      });
+
       toast.success(res.data.message);
-      const{userRole,user}=res.data
+      const { userRole, user } = res.data;
       setUser(user);
-      setUserRole(userRole)
+      setUserRole(userRole);
       setTimeout(() => {
-        navigate('/teachermain')
+        navigate('/teachermain');
       }, 2000);
     } catch (error) {
       if (error.response) {
         toast.error(error.response.data.message);
       } else {
-        toast.error("something went wrong");
+        toast.error("Something went wrong");
       }
-      console.log("error occur in the deleting student data");
-
-
+      console.log("Error occurred faculty login");
     }
-    
-    
-    // Add your login API call here!
   };
 
   return (
@@ -52,7 +50,7 @@ function Login() {
           Login
         </h2>
 
-        <form  className="space-y-6">
+        <form className="space-y-6">
 
           {/* Email Input */}
           <div className="relative">
@@ -67,24 +65,30 @@ function Login() {
             />
           </div>
 
-          {/* Password Input */}
+          {/* Password Input with toggle icon */}
           <div className="relative">
             <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="pl-10 pr-4 py-3 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+              className="pl-10 pr-10 py-3 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
               required
             />
+            <span
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </span>
           </div>
 
           {/* Forgot Password */}
           <div className="flex justify-end -mt-4">
             <p
               className="text-sm text-green-500 cursor-pointer hover:underline"
-              onClick={() => navigate('/teacheremail')} // 👈 navigate to teachermain
+              onClick={() => navigate('/teacheremail')}
             >
               Forgot Password?
             </p>
@@ -98,14 +102,11 @@ function Login() {
           >
             Login
           </button>
-
         </form>
 
         {/* Sign in with Google */}
         <div className="mt-6 text-center">
-          <button
-            className="w-full flex items-center justify-center gap-3 border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-100 transition text-lg font-semibold"
-          >
+          <button className="w-full flex items-center justify-center gap-3 border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-100 transition text-lg font-semibold">
             <FcGoogle className="text-2xl" /> 
             Sign in with Google
           </button>
@@ -116,14 +117,13 @@ function Login() {
           Don't have an account?{' '}
           <span
             className="text-green-500 hover:underline cursor-pointer"
-            onClick={() => navigate('/teacherregister')} // 👈 navigate to teacherregister
+            onClick={() => navigate('/teacherregister')}
           >
             Signup
           </span>
         </p>
 
       </div>
-      <ToastContainer /> 
     </div>
   );
 }

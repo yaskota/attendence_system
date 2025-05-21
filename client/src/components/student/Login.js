@@ -5,7 +5,7 @@ import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom"; // <== import navigate
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
-import { ToastContainer, toast } from "react-toastify";
+import {  toast } from "react-toastify";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -34,14 +34,14 @@ function Login() {
       setUserRole(userRole);
       setTimeout(() => {
         navigate("/studentmain");
-      }, 2000);
+      }, 3000);
     } catch (error) {
       if (error.response) {
         toast.error(error.response.data.message);
       } else {
         toast.error("something went wrong");
       }
-      console.log("error occur in the deleting student data");
+      console.log("error occur in the student login");
     }
   };
 
@@ -65,7 +65,7 @@ function Login() {
           Login
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form  className="space-y-6">
           {/* Email */}
           <div className="relative">
             <FaEnvelope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -148,8 +148,9 @@ function Login() {
             Register
           </span>
         </p>
+        
       </div>
-      <ToastContainer /> 
+      
     </div>
   );
 }

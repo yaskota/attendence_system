@@ -1,18 +1,19 @@
 import axios from 'axios';
 import React, { useState } from 'react';
-import { FaUser, FaEnvelope, FaLock, FaPhone, FaIdBadge } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaLock, FaPhone, FaIdBadge, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 
 function Register() {
-  const navigate=useNavigate()
+  const navigate = useNavigate();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
   const [teacherId, setTeacherId] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // 👈 New state for toggling
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const user = {
@@ -20,41 +21,37 @@ function Register() {
         email,
         password,
         phno: phone,
-        teacher_id:teacherId
-      }
-      console.log("bb")
+        teacher_id: teacherId
+      };
+
       const res = await axios.post('http://localhost:8080/api/authteacher/register', user, {
         withCredentials: true
-      })
-      console.log("cc")
+      });
+
       toast.success(res.data.message);
       setTimeout(() => {
-        navigate('/teacherotp')
+        navigate('/teacherotp' ,  { state: { email } });
       }, 2000);
     } catch (error) {
       if (error.response) {
         toast.error(error.response.data.message);
       } else {
-        toast.error("something went wrong");
+        toast.error("Something went wrong");
       }
-      console.log("error occur in the deleting student data");
-
-
+      console.log("Error occurred in the faculty register");
     }
-    
-    // Add your register API logic here!
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-300 via-green-200 to-yellow-300 flex items-center justify-center p-6">
       <div className="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-lg mt-16">
-        
+
         {/* Heading */}
         <h2 className="text-4xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-blue-500 mb-10">
           Create Account
         </h2>
 
-        <form  className="space-y-6">
+        <form className="space-y-6">
 
           {/* Name */}
           <div className="relative">
@@ -82,17 +79,23 @@ function Register() {
             />
           </div>
 
-          {/* Password */}
+          {/* Password with eye toggle */}
           <div className="relative">
             <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="pl-10 pr-4 py-3 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+              className="pl-10 pr-10 py-3 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
               required
             />
+            <span
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </span>
           </div>
 
           {/* Phone Number */}
@@ -129,19 +132,20 @@ function Register() {
           >
             Register
           </button>
-
         </form>
 
         {/* Login Link */}
         <p className="mt-8 text-center text-sm text-gray-600">
           Already have an account?{' '}
-          <span className="text-green-500 hover:underline cursor-pointer" onClick={()=>{navigate('/teacherlogin')}}>
+          <span
+            className="text-green-500 hover:underline cursor-pointer"
+            onClick={() => navigate('/teacherlogin')}
+          >
             Login
           </span>
         </p>
 
       </div>
-      <ToastContainer /> 
     </div>
   );
 }

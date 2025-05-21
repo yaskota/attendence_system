@@ -11,11 +11,11 @@ const upload = multer({ storage });
 studentrouter.post('/register',validateSignup,register)
 studentrouter.post('/login',validateLogin,login)
 studentrouter.post('/logout',logout)
-studentrouter.post('/otpSend',userAuth,otp_Send)
-studentrouter.post('/verifyEmail',userAuth,verify_Email)
+studentrouter.post('/otpSend',otp_Send)
+studentrouter.post('/verifyEmail',verify_Email)
 studentrouter.post('/is_Auth',userAuth,is_Authenticated)
-studentrouter.post('/resendOtp',userAuth,resendOtp)
-studentrouter.post('/resetPassword',userAuth,resetpassword)
+studentrouter.post('/resendOtp',resendOtp)
+studentrouter.post('/resetPassword',resetpassword)
 studentrouter.delete('/deleteUnverifiedStudents',delete_unverify_students);
 
 studentrouter.post('/profileupdate', upload.single("photo"), userAuth, profileupdate);

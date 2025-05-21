@@ -102,7 +102,7 @@ function Header() {
         {user ? (
           <div className="flex items-center space-x-4">
             <img
-              src={user.profile || "/images/collegeimage.jpg"}
+              src={user.profile || "/images/profilephoto2.jpg"}
               alt="Profile"
               onClick={goToProfile}
               className="w-10 h-10 rounded-full cursor-pointer hover:scale-110 transition-transform"

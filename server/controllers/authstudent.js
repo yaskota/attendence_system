@@ -6,6 +6,8 @@ import transporter from "../nodemail.js";
 import cloudinary from "../cloudinary.js";
 import attendencemodel from "../models/attendence.js";
 import teachermodel from "../models/teacher.js";
+import verifyOtpTemp from "../utils/verifyOtpTemp.js";
+import resetPasswordTemp from "../utils/resetPasswordTemp.js";
 
 export const register = async (req, res) => {
   const { name, rollNo, start_year, email, password, phno, branch } = req.body;
@@ -43,7 +45,7 @@ export const register = async (req, res) => {
       start_year,
       password: hashpassword,
       phno,
-      branch,
+      branch: branch.toUpperCase(),
       otp: otp,
       otp_expiry_time: Date.now() + 5 * 60 * 1000,
     };
@@ -51,22 +53,13 @@ export const register = async (req, res) => {
     const User = new studentmodel(newstudent);
     await User.save();
 
-    const token = jwt.sign({ id: User._id }, process.env.SECRET_KEY, {
-      expiresIn: "7d",
-    });
-
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    
 
     const verificationMail = {
       from: process.env.SENDER_EMAIL,
       to: email,
       subject: "welcome to JNTU sulthanpur",
-      text: `Welcome to JNTU sulthanpur your account has been created by email id ${email} and verify your account using the otp : ${otp} `,
+      html: verifyOtpTemp(name,email,otp) 
     };
 
     await transporter.sendMail(verificationMail);
@@ -144,6 +137,7 @@ export const otp_Send = async (req, res) => {
     const otp = String(Math.floor(10000 + Math.random() * 90000));
 
     const email = user.email;
+    const name= user.name;
 
     user.otp = otp;
     user.otp_expiry_time = Date.now() + 5 * 60 * 1000;
@@ -154,7 +148,7 @@ export const otp_Send = async (req, res) => {
       from: process.env.SENDER_EMAIL,
       to: email,
       subject: "Account verification OTP",
-      text: `your otp is ${otp} . verify your account using this OTP`,
+      html: resetPasswordTemp(name,email,otp) 
     };
 
     await transporter.sendMail(otpEmail);
@@ -168,9 +162,9 @@ export const otp_Send = async (req, res) => {
 
 export const verify_Email = async (req, res) => {
   try {
-    const { USER_ID, OTP } = req.body;
+    const { email, OTP } = req.body;
 
-    const user = await studentmodel.findById(USER_ID);
+    const user = await studentmodel.findOne({email});
 
     console.log(user);
 
@@ -216,6 +210,8 @@ export const resendOtp = async (req, res) => {
       return res.status(401).send({ message: "user not found" });
     }
     const otp = String(Math.floor(10000 + Math.random() * 90000));
+
+    const name =user.name;
     user.resendotp = otp;
     user.resend_otp_expiry_time = Date.now() + 10 * 60 * 1000;
     await user.save();
@@ -224,7 +220,7 @@ export const resendOtp = async (req, res) => {
       from: process.env.SENDER_EMAIL,
       to: email,
       subject: "reset password",
-      text: `verification otp ${otp},used to reset password`,
+      html: resetPasswordTemp(name,email,otp) 
     };
 
     await transporter.sendMail(resend_email);
@@ -289,31 +285,38 @@ export const delete_unverify_students = async (req, res) => {
 
 export const profileupdate = async (req, res) => {
   const { USER_ID } = req.body;
+  console.log("USER_ID:", USER_ID);
+
   if (!USER_ID) {
     return res.status(400).send({ message: "user id not found" });
   }
+
   const user = await studentmodel.findById(USER_ID);
   if (!user) {
     return res.status(401).send({ message: "user not found" });
   }
+
+  if (!req.file) {
+    return res.status(400).send({ message: "No file uploaded" });
+  }
+
   const uploadStream = cloudinary.uploader.upload_stream(
     { folder: "myApp" },
     async (error, result) => {
-      if (error) return res.status(500).json({ error });
+      if (error) {
+        console.error("Cloudinary Upload Error:", error);
+        return res.status(500).json({ error });
+      }
 
       user.profile = result.secure_url;
-
       await user.save();
-      res.status(200).send({user,message:"profile update succesfully"});
+      return res.status(200).send({ user, message: "profile update successfully" });
     }
   );
 
   uploadStream.end(req.file.buffer);
-  try {
-  } catch (error) {
-    return res.status(400).send({ message: "error occur in profile update" });
-  }
 };
+
 
 export const studentattendencedetails = async (req, res) => {
     const { USER_ID } = req.body;

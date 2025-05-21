@@ -1,11 +1,13 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
+import {  toast } from "react-toastify";
+
 
 function Email() {
   const [email, setEmail] = useState("");
   const navigate = useNavigate();
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,7 +32,7 @@ function Email() {
       } else {
         toast.error("something went wrong");
       }
-      console.log("error occur in the deleting student data");
+      console.log("error occur in the email sending");
     }
 
     // You can handle the email submission here!
@@ -67,7 +69,7 @@ function Email() {
           </button>
         </form>
       </div>
-      <ToastContainer /> 
+      
     </div>
   );
 }

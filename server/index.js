@@ -2,7 +2,7 @@ import express from 'express'
 import dotenv from 'dotenv'
 import mongodb from './db.js'
 import cors from 'cors';
-
+import http from 'http';
 
 
 import studentrouter from './routers/studentrouter.js'
@@ -12,6 +12,7 @@ import teacherrouter from './routers/teacherrouter.js'
 import classrouter from './routers/classrouter.js'
 import attendencerouter from './routers/attendencerouter.js'
 import adminrouter from './routers/adminrouter.js';
+import { initializeWebSocket } from './ws/websocket.js';
 
 const app=express()
 dotenv.config()
@@ -40,6 +41,10 @@ app.use('/api/attendence',attendencerouter);
 app.use('/api/admin',adminrouter)
 
 mongodb();
+
+const server = http.createServer(app);
+initializeWebSocket(server);
+
 const port=process.env.PORT || 8080;
 
 app.listen(port,()=>{

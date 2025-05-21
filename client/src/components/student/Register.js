@@ -11,7 +11,7 @@ import {
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
+import {  toast } from "react-toastify";
 
 function Register() {
   const [name, setName] = useState("");
@@ -56,7 +56,7 @@ function Register() {
       console.log("cc");
       toast.success(res.data.message);
       setTimeout(() => {
-        navigate("/studentotp");
+        navigate("/studentotp", { state: { email } });
       }, 2000);
     } catch (error) {
       if (error.response) {
@@ -64,7 +64,7 @@ function Register() {
       } else {
         toast.error("something went wrong");
       }
-      console.log("error occur in the deleting student data");
+      console.log("error occur in student register");
     }
   };
 
@@ -225,7 +225,7 @@ function Register() {
           </span>
         </p>
       </div>
-      <ToastContainer /> 
+      
     </div>
   );
 }

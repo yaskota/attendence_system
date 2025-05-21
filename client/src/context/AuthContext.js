@@ -1,7 +1,7 @@
-// context/AuthContext.js
+
 import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 
 const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider value={{ user, setUser, logout, loading,userRole,setUserRole }}>
       {children}
-      <ToastContainer />
+      
     </AuthContext.Provider>
   );
 };

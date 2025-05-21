@@ -6,40 +6,72 @@ import { useNavigate } from 'react-router-dom';
 function Teachermain() {
   const navigate = useNavigate();
   const [classes, setClasses] = useState([]);
-  useEffect(()=>{
-   
-    handledata()
-  },[])
+  const [teacher, setTeacher] = useState({});
 
-  const handledata=async()=>{
+  useEffect(() => {
+    fetchProfile();
+    handledata();
+  }, []);
+
+  const fetchProfile = async () => {
     try {
-      const res=await axios.get('http://localhost:8080/api/class/gather',{withCredentials: true})
-      console.log(res.data);
-      setClasses(res.data)
+      const res = await axios.get('http://localhost:8080/api/authteacher/teacherdetails', { withCredentials: true });
+      setTeacher(res.data);
     } catch (error) {
-      console.log("error occur in ")
+      console.error("Error fetching teacher profile");
+      if (error.response) {
+        console.log(error.response.data);
+      }
+    }
+  };
+
+  const handledata = async () => {
+    try {
+      const res = await axios.get('http://localhost:8080/api/class/gather', { withCredentials: true });
+      setClasses(res.data);
+    } catch (error) {
+      console.log("Error fetching class data");
       if (error.response) {
         console.log("Response error:", error.response.data);
       }
     }
-  }
+  };
 
-  const handleDelete = async(index) => {
+  const handleDelete = async (index) => {
     try {
-      const res=await axios.delete(`http://localhost:8080/api/class/delete/${index}`);
-      console.log(res.data)
-      handledata()
+      const res = await axios.delete(`http://localhost:8080/api/class/delete/${index}`);
+      console.log(res.data);
+      handledata();
     } catch (error) {
-      console.log("error occur in delete")
-      if(error.response)
-      {
-        console.log('Response error:', error.response.data)
+      console.log("Error deleting class");
+      if (error.response) {
+        console.log('Response error:', error.response.data);
       }
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-100 p-6 mt-20">
+      {/* Teacher Profile */}
+      <div className="bg-white rounded-xl shadow-lg flex flex-col md:flex-row p-8 mb-10">
+        <div className="flex justify-center md:justify-start mb-6 md:mb-0 md:mr-10">
+          <img
+            src={teacher.profile || "/images/profilephoto2.jpg"}
+            alt="Teacher"
+            className="w-40 h-40 object-cover rounded-full border-4 border-indigo-500"
+          />
+        </div>
+
+        <div className="flex-1 space-y-4">
+          <h2 className="text-3xl font-bold text-indigo-700">{teacher.name}</h2>
+          <div className="text-gray-600 space-y-1">
+            <p><strong>Name:</strong> {teacher.name}</p>
+            <p><strong>Email:</strong> {teacher.email}</p>
+            <p><strong>Faculty Id:</strong> {teacher.teacher_id}</p>
+          </div>
+        </div>
+      </div>
+
       <h1 className="text-3xl font-bold text-indigo-700 mb-8 text-center">
         Faculty Dashboard
       </h1>
@@ -50,7 +82,6 @@ function Teachermain() {
           <button onClick={() => navigate('/subject')} className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition">
             Add Subject
           </button>
-          
           <button className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition">
             Assignments
           </button>
@@ -77,21 +108,18 @@ function Teachermain() {
                 >
                   <div>
                     <h3 className="text-2xl font-bold text-indigo-700 mb-4">{cls.subject}</h3>
-                    
                     <p className="text-gray-600"><strong>Branch:</strong> {cls.branch}</p>
                     <p className="text-gray-600"><strong>Start Year:</strong> {cls.start_year}</p>
                   </div>
 
-                  {/* Buttons */}
                   <div className="flex justify-between items-center mt-6">
-                    <button 
+                    <button
                       onClick={() => navigate('/updatesubject', { state: { classDetails: cls } })}
                       className="flex items-center gap-2 px-3 py-2 bg-yellow-500 hover:bg-yellow-400 text-white rounded-lg text-sm transition"
                     >
                       <FaEdit />
                       Edit
                     </button>
-
                     <button
                       onClick={() => handleDelete(cls._id)}
                       className="flex items-center gap-2 px-3 py-2 bg-red-500 hover:bg-red-400 text-white rounded-lg text-sm transition"
@@ -99,10 +127,10 @@ function Teachermain() {
                       <FaTrash />
                       Delete
                     </button>
-
                     <button
-                    onClick={() => navigate('/attendence', { state: { classDetails: cls } })}
-                     className="flex items-center gap-2 px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm transition">
+                      onClick={() => navigate('/attendence', { state: { classDetails: cls } })}
+                      className="flex items-center gap-2 px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm transition"
+                    >
                       <FaArrowRight />
                       Enter
                     </button>
@@ -112,7 +140,6 @@ function Teachermain() {
             </div>
           )}
         </div>
-
       </div>
     </div>
   );

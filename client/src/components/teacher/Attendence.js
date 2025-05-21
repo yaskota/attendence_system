@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { FaIdCard } from "react-icons/fa";
+import React, { useEffect, useState, useCallback } from "react";
+
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 
 function Attendence() {
   const [rollNo, setRollNo] = useState("");
@@ -11,40 +11,15 @@ function Attendence() {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [periods, setPeriods] = useState("");
+  const [ws, setWs] = useState(null);
+  const [availableDevices, setAvailableDevices] = useState([]);
+  const [pairedDevice, setPairedDevice] = useState(null);
 
   const navigate = useNavigate();
   const location = useLocation();
   const { classDetails } = location.state;
 
-  
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const Data = {
-        rollNo,
-        subject: classDetails.subject,
-        branch: classDetails.branch,
-        periods,
-        startTime,
-        endTime,
-      };
-      const res = await axios.post(
-        "http://localhost:8080/api/attendence/attend",
-        Data,
-        { withCredentials: true }
-      );
-      console.log(res.data);
-      handledata();
-    } catch (error) {
-      console.log("error occur in attendence");
-      if (error.response) {
-        console.log(error.response.data);
-      }
-    }
-  };
-
-  const handledata = async () => {
+  const handledata = useCallback(async () => {
     try {
       const Data = {
         start_year: classDetails.start_year,
@@ -64,6 +39,113 @@ function Attendence() {
       if (error.response) {
         console.log(error.response.data);
       }
+    }
+  }, [classDetails, startTime, endTime]);
+
+  useEffect(() => {
+    const socket = new WebSocket("ws://192.168.1.14:8080/frontend");
+    setWs(socket);
+
+    socket.onopen = () => {
+      console.log(" WebSocket connected");
+      toast.success(" WebSocket connected");
+    };
+
+    socket.onmessage = async (event) => {
+      try {
+        const msg = JSON.parse(event.data);
+
+        if (msg.type === "availableDevice" && msg.deviceId) {
+          setAvailableDevices((prev) =>
+            prev.includes(msg.deviceId) ? prev : [...prev, msg.deviceId]
+          );
+        }
+
+        if (msg.type === "rfidScan") {
+          const exists = attendanceList.find((s) => s.rollNo === msg.rollNo);
+          if (!exists) {
+            const postData = {
+              rollNo: msg.rollNo,
+              subject: classDetails.subject,
+              branch: classDetails.branch,
+              start_year: classDetails.start_year,
+              periods,
+              startTime,
+              endTime,
+            };
+
+            const res = await axios.post(
+              "http://localhost:8080/api/attendence/attend",
+              postData,
+              {
+                withCredentials: true,
+              }
+            );
+            toast.success(res.data.message);
+            handledata();
+          }
+        }
+      } catch (error) {
+        if (error.response) {
+          toast.error(error.response.data.message);
+        } else {
+          toast.error("something went wrong");
+        }
+        console.log("error occur in taking attendence");
+      }
+    };
+
+    socket.onclose = () => {
+      console.log(" WebSocket disconnected");
+      toast.error(" WebSocket disconnected");
+    };
+
+    return () => socket.close();
+  }, [attendanceList, classDetails, endTime, handledata, periods, startTime]);
+
+  const handlePair = (deviceId) => {
+    setPairedDevice(deviceId);
+    setIsReading(true);
+    if (ws) {
+      ws.send(JSON.stringify({ type: "PAIR_CONFIRM", deviceId }));
+    }
+  };
+
+  const handleStopReading = () => {
+    setIsReading(false);
+    setPairedDevice(null);
+    setAvailableDevices([]);
+    if (ws && pairedDevice) {
+      ws.send(JSON.stringify({ type: "DEPAIR", deviceId: pairedDevice }));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const Data = {
+        rollNo,
+        subject: classDetails.subject,
+        branch: classDetails.branch,
+        start_year: classDetails.start_year,
+        periods,
+        startTime,
+        endTime,
+      };
+      const res = await axios.post(
+        "http://localhost:8080/api/attendence/attend",
+        Data,
+        { withCredentials: true }
+      );
+      toast.success(res.data.message);
+      handledata();
+    } catch (error) {
+      if (error.response) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("something went wrong");
+      }
+      console.log("error occur in taking attendence");
     }
   };
 
@@ -85,18 +167,8 @@ function Attendence() {
       } else {
         toast.error("something went wrong");
       }
-      console.log("error occur in the deleting student data");
-
-
+      console.log("error occur in the deleting student attendence");
     }
-  };
-
-  const handleStartReading = () => {
-    setIsReading(true);
-  };
-
-  const handleStopReading = () => {
-    setIsReading(false);
   };
 
   const handleSaveAttendance = async () => {
@@ -123,9 +195,7 @@ function Attendence() {
       } else {
         toast.error("something went wrong");
       }
-      console.log("error occur in the deleting student data");
-
-
+      console.log("error occur in saving attendence");
     }
   };
 
@@ -133,33 +203,24 @@ function Attendence() {
     <div className="p-8 min-h-screen mt-16">
       <h2 className="text-3xl font-bold text-center mb-8">Take Attendance</h2>
 
-      {/* Top Section - Class Details and Time Inputs */}
+      {/* Class Details + Time Inputs */}
       <div className="flex flex-col md:flex-row justify-between items-start mb-8 gap-6">
         <div className="bg-white shadow-md rounded-lg p-6 w-full md:w-1/2 max-w-sm">
           <h3 className="text-lg font-semibold text-indigo-600 mb-4">
             Class Details
           </h3>
-          <p>
-            <strong>Subject:</strong> {classDetails.subject}
-          </p>
-          <p>
-            <strong>Branch:</strong> {classDetails.branch}
-          </p>
-          <p>
-            <strong>Start Year:</strong> {classDetails.start_year}
-          </p>
+          <p><strong>Subject:</strong> {classDetails.subject}</p>
+          <p><strong>Branch:</strong> {classDetails.branch}</p>
+          <p><strong>Start Year:</strong> {classDetails.start_year}</p>
         </div>
 
-        {/* Time Slot + Periods */}
         <div className="bg-white shadow-md rounded-lg p-6 w-full md:w-1/2 max-w-sm">
           <h3 className="text-lg font-semibold text-indigo-600 mb-4">
             Time Slot & Periods
           </h3>
           <div className="flex flex-col space-y-4">
             <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Start Time
-              </label>
+              <label className="block text-gray-700 font-medium mb-1">Start Time</label>
               <input
                 type="time"
                 value={startTime}
@@ -168,9 +229,7 @@ function Attendence() {
               />
             </div>
             <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                End Time
-              </label>
+              <label className="block text-gray-700 font-medium mb-1">End Time</label>
               <input
                 type="time"
                 value={endTime}
@@ -179,9 +238,7 @@ function Attendence() {
               />
             </div>
             <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Periods
-              </label>
+              <label className="block text-gray-700 font-medium mb-1">Periods</label>
               <input
                 type="number"
                 min="1"
@@ -195,12 +252,10 @@ function Attendence() {
         </div>
       </div>
 
-      {/* Roll No Entry and RFID */}
+      {/* Manual Entry + RFID Reader */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
         <div className="bg-white shadow-lg rounded-lg p-8">
-          <h3 className="text-xl font-semibold mb-6 text-indigo-600 text-center">
-            Enter Roll No
-          </h3>
+          <h3 className="text-xl font-semibold mb-6 text-indigo-600 text-center">Enter Roll No</h3>
           <form className="flex flex-col items-center space-y-6">
             <input
               type="text"
@@ -221,37 +276,35 @@ function Attendence() {
 
         <div className="bg-white shadow-lg rounded-lg p-8 flex flex-col items-center justify-center space-y-6">
           <h3 className="text-xl font-semibold text-indigo-600">RFID Reader</h3>
-          <div className="w-24 h-24 flex items-center justify-center bg-gray-100 rounded-full">
-            {isReading ? (
-              <div className="animate-spin h-8 w-8 border-4 border-indigo-600 border-t-transparent rounded-full"></div>
-            ) : (
-              <FaIdCard className="text-5xl text-indigo-600" />
-            )}
-          </div>
           {!isReading ? (
-            <button
-              onClick={handleStartReading}
-              className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-md text-sm transition w-32"
-            >
-              Start Reading
-            </button>
+            availableDevices.map((id) => (
+              <button
+                key={id}
+                onClick={() => handlePair(id)}
+                className="bg-black text-white px-4 py-2 rounded"
+              >
+                Pair with {id}
+              </button>
+            ))
           ) : (
-            <button
-              onClick={handleStopReading}
-              className="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-md text-sm transition w-32"
-            >
-              Stop Reading
-            </button>
+            <>
+              <p>📶 Paired with: {pairedDevice}</p>
+              <button
+                onClick={handleStopReading}
+                className="bg-red-600 text-white px-4 py-2 rounded"
+              >
+                🛑 Stop
+              </button>
+            </>
           )}
         </div>
       </div>
 
-      {/* Attendance Table */}
+      {/* Attendance List */}
       <div className="mt-10 bg-white shadow-lg rounded-lg p-8">
         <h3 className="text-xl font-semibold text-center text-indigo-600 mb-6">
           Attendance List
         </h3>
-
         <div className="overflow-x-auto">
           <table className="w-full table-auto">
             <thead>
@@ -269,7 +322,7 @@ function Attendence() {
                     <td className="py-2 px-4 border">{record.rollNo}</td>
                     <td className="py-2 px-4 border">{record.studentname}</td>
                     <td className="py-2 px-4 border">
-                      {record.todayCount*Number(periods)}
+                      {record.todayCount * Number(periods)}
                     </td>
                     <td className="py-2 px-4 border">
                       <button
@@ -304,7 +357,6 @@ function Attendence() {
           </button>
         </div>
       </div>
-      <ToastContainer /> 
     </div>
   );
 }

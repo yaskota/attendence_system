@@ -1,34 +1,44 @@
-import React, { useState } from 'react';
-import axios from 'axios'
+import React, { useState } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 function Main() {
-  const [teacherId, setTeacherId] = useState('');
+  const [teacherId, setTeacherId] = useState("");
 
-  const handleTeacherSubmit = async(e) => {
+  const handleTeacherSubmit = async (e) => {
     e.preventDefault();
     try {
-        const Data={id:teacherId}
-        const res=await axios.post('http://localhost:8080/api/teacher_id',Data,{withCredentials:true})
-        console.log(res.data.message);
-
+      const Data = { id: teacherId };
+      const res = await axios.post(
+        "http://localhost:8080/api/teacher_id",
+        Data,
+        { withCredentials: true }
+      );
+      console.log(res.data.message);
+      toast.success(res.data.message);
     } catch (error) {
-        console.log("error occur in admin id submit")
-        
+      if (error.response) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("something went wrong");
+      }
+      console.log("error occur in the faculty id sending");
     }
   };
 
   const handleSendToRFID = () => {
-    console.log('Sending data to student RFID cards...');
+    console.log("Sending data to student RFID cards...");
     // Your logic here
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center p-4">
       <div className="grid md:grid-cols-2 gap-8 w-full max-w-4xl">
-
         {/* Card 1: Teacher ID Submission */}
         <div className="bg-white rounded-xl shadow-xl p-8">
-          <h2 className="text-2xl font-bold text-indigo-700 mb-6">Submit Teacher ID</h2>
+          <h2 className="text-2xl font-bold text-indigo-700 mb-6">
+            Submit Teacher ID
+          </h2>
           <form onSubmit={handleTeacherSubmit} className="space-y-4">
             <input
               type="text"
@@ -50,9 +60,12 @@ function Main() {
         {/* Card 2: Send to RFID */}
         <div className="bg-white rounded-xl shadow-xl p-8 flex flex-col justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-pink-600 mb-4">Send Data to Student RFID</h2>
+            <h2 className="text-2xl font-bold text-pink-600 mb-4">
+              Send Data to Student RFID
+            </h2>
             <p className="text-gray-600 mb-6">
-              Click the button below to transfer today's data to all student RFID cards.
+              Click the button below to transfer today's data to all student
+              RFID cards.
             </p>
           </div>
           <button
@@ -62,7 +75,6 @@ function Main() {
             Send to RFID
           </button>
         </div>
-
       </div>
     </div>
   );

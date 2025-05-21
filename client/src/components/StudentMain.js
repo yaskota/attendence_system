@@ -53,7 +53,7 @@ function StudentMain() {
       <div className="bg-white rounded-xl shadow-lg flex flex-col md:flex-row p-8 mb-10">
         <div className="flex justify-center md:justify-start mb-6 md:mb-0 md:mr-10">
           <img
-            src={student.photo || "/images/collegeimage.jpg"}
+            src={student.profile || "/images/profilephoto2.jpg"}
             alt="Student"
             className="w-48 h-48 object-cover rounded-full border-4 border-indigo-500"
           />

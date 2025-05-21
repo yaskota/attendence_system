@@ -5,6 +5,8 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs';
 import transporter from '../nodemail.js'
 import cloudinary from "../cloudinary.js";
+import verifyOtpTemp from '../utils/verifyOtpTemp.js';
+import resetPasswordTemp from '../utils/resetPasswordTemp.js';
 
 export const register=async(req,res)=>{
     const {name,email,password,phno,teacher_id}=req.body;
@@ -18,7 +20,7 @@ export const register=async(req,res)=>{
         const userteacher=await teacher_idmodel.findOne({id:teacher_id});
         if(!userteacher)
         {
-            return res.status(400).send({message:"you are not a staff"});
+            return res.status(400).send({message:"you are not a faculty ID incorrect"});
         }
         
         const user =await teachermodel.findOne({teacher_id});
@@ -39,26 +41,19 @@ export const register=async(req,res)=>{
             password:hashpassword,
             phno,teacher_id,
             otp:otp,
-            otp_expiry_time:Date.now()+24*60*60*1000
+            otp_expiry_time:Date.now()+5*60*60*1000
         }
 
         const User=new teachermodel(newteacher);
         await User.save();
 
-        const token=jwt.sign({id:User._id},process.env.SECRET_KEY,{expiresIn:'7d'})
-
-        res.cookie('token',token ,{
-            httpOnly:true,
-            secure:process.env.NODE_ENV === 'production',
-            sameSite:process.env.NODE_ENV === 'production'?'none':'strict',
-            maxAge :7*24*60*60*1000
-        })
+        
 
         const verificationMail={
             from:process.env.SENDER_EMAIL,
             to:email,
             subject:"welcome to JNTU sulthanpur",
-            text:`Welcome to JNTU sulthanpur your account has been created by email id ${email} and verify user with otp : ${otp}`
+            html: verifyOtpTemp(name,email,otp) 
         }
 
         await transporter.sendMail(verificationMail);
@@ -72,13 +67,16 @@ export const register=async(req,res)=>{
 
 export const login=async(req,res)=>{
     const {email,password}=req.body;
+    console.log(email);
+    console.log(password);
     if(!email || !password)
     {
         return res.status(505).send({message:"Data missing"});
     }
     try {
+
         const user=await teachermodel.findOne({email});
-        if(!email)
+        if(!user)
         {
             return res.status(400).send({message:"email Not exist"});
         }
@@ -167,9 +165,9 @@ export const otp_Send=async(req,res)=>{
 export const verify_Email=async(req,res)=>{
 
     try {
-        const {USER_ID,OTP}=req.body;
+        const {email,OTP}=req.body;
 
-        const user=await teachermodel.findById(USER_ID)
+        const user=await teachermodel.findOne({email})
         
         console.log(user);
         
@@ -221,6 +219,7 @@ export const resendOtp=async(req,res)=>{
             return res.status(401).send({message:"user not found"})
         }
         const otp=String(Math.floor(10000+Math.random()*90000));
+        const name=user.name;
         user.resendotp=otp;
         user.resend_otp_expiry_time=Date.now()+10*60*1000;
         await user.save();
@@ -229,7 +228,7 @@ export const resendOtp=async(req,res)=>{
             from:process.env.SENDER_EMAIL,
             to:email,
             subject:"reset password",
-            text:`verification otp ${otp},used to reset password`
+            html: resetPasswordTemp(name,email,otp) 
         }
 
         await transporter.sendMail(resend_email);
@@ -328,3 +327,23 @@ export const teacherdetails=async(req,res)=>{
         console.log('error occur in get student details')
     }
   }
+
+  export const delete_unverify_teachers = async (req, res) => {
+    try {
+      const currentTime = Date.now();
+      const verify = await teachermodel.deleteMany({
+        user_verify: false,
+        otp_expiry_time: { $lt: currentTime },
+      });
+      return res.status(400).send({ message: "Unverified faculty deleted" });
+    } catch (error) {
+      console.log(error.data);
+      return res
+        .status(401)
+        .send({
+          message: "error occur in delete unverified student deletion",
+          error,
+        });
+    }
+  };
+  

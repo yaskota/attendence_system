@@ -1,8 +1,48 @@
-import React from 'react';
-import Header from './Header'; // Import the Header component
-import { FaInstagram, FaTwitter, FaFacebook, FaEnvelope, FaPhone } from 'react-icons/fa';
+import React, { useEffect } from "react";
+import Header from "./Header"; // Import the Header component
+import axios from "axios";
+// import { toast } from "react-toastify";
+import {
+  FaInstagram,
+  FaTwitter,
+  FaFacebook,
+  FaEnvelope,
+  FaPhone,
+} from "react-icons/fa";
 
 function HomePage() {
+  useEffect(() => {
+    const deleteStudents = async () => {
+      try {
+        const res = await axios.delete(
+          "http://localhost:8080/api/authstudent/deleteUnverifiedStudents"
+        );
+        console.log(res.data.message);
+      } catch (error) {
+        
+        console.log("error occur in the delete students");
+      }
+    };
+    
+    deleteStudents();
+    
+  },[]);
+
+  useEffect(()=>{
+    const deleteFaculty = async () => {
+      try {
+        const res = await axios.delete(
+          "http://localhost:8080/api/authteacher/deleteunverifiedteachers"
+        );
+        console.log(res.data.message);
+      } catch (error) {
+        
+        console.log("error occur in the delete faculty");
+      }
+    };
+    deleteFaculty();
+  },[])
+
   return (
     <div className="relative">
       <Header />
@@ -11,15 +51,18 @@ function HomePage() {
       <section
         id="home"
         className="h-screen bg-fixed bg-cover bg-center flex items-center justify-center text-white"
-        style={{ backgroundImage: `url('https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1470&q=80')` }}
+        style={{
+          backgroundImage: `url('https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1470&q=80')`,
+        }}
       >
         <div className="flex flex-col md:flex-row items-center max-w-7xl mx-auto p-4">
           {/* Left - Description */}
           <div className="md:w-1/2 text-center md:text-left space-y-6">
             <h1 className="text-5xl font-bold">Welcome to AMS College</h1>
             <p className="text-lg">
-              AMS College is dedicated to fostering innovation, excellence, and leadership. We offer
-              top-tier education with world-class infrastructure and experienced faculty.
+              AMS College is dedicated to fostering innovation, excellence, and
+              leadership. We offer top-tier education with world-class
+              infrastructure and experienced faculty.
             </p>
           </div>
 
@@ -38,7 +81,6 @@ function HomePage() {
       <section id="branch" className="py-20 bg-green-50">
         <h2 className="text-4xl font-bold text-center mb-12">Our Branches</h2>
         <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-10 p-4">
-          
           {/* CSE */}
           <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition">
             <img
@@ -48,8 +90,11 @@ function HomePage() {
             />
             <h3 className="text-2xl font-semibold mb-2">CSE</h3>
             <p>
-              Computer Science Engineering focuses on software, algorithms, and technologies shaping the future.
-              <span className="text-blue-500 cursor-pointer ml-2">Some more...</span>
+              Computer Science Engineering focuses on software, algorithms, and
+              technologies shaping the future.
+              <span className="text-blue-500 cursor-pointer ml-2">
+                Some more...
+              </span>
             </p>
           </div>
 
@@ -62,8 +107,11 @@ function HomePage() {
             />
             <h3 className="text-2xl font-semibold mb-2">CSM</h3>
             <p>
-              Computer Science & Machine Learning is all about AI, data science, and modern intelligent systems.
-              <span className="text-blue-500 cursor-pointer ml-2">Some more...</span>
+              Computer Science & Machine Learning is all about AI, data science,
+              and modern intelligent systems.
+              <span className="text-blue-500 cursor-pointer ml-2">
+                Some more...
+              </span>
             </p>
           </div>
 
@@ -76,11 +124,13 @@ function HomePage() {
             />
             <h3 className="text-2xl font-semibold mb-2">MECH</h3>
             <p>
-              Mechanical Engineering shapes industries with expertise in design, materials, and mechanics.
-              <span className="text-blue-500 cursor-pointer ml-2">Some more...</span>
+              Mechanical Engineering shapes industries with expertise in design,
+              materials, and mechanics.
+              <span className="text-blue-500 cursor-pointer ml-2">
+                Some more...
+              </span>
             </p>
           </div>
-
         </div>
       </section>
 
@@ -89,8 +139,10 @@ function HomePage() {
         <h2 className="text-4xl font-bold text-center mb-10">About Us</h2>
         <div className="max-w-5xl mx-auto space-y-8 text-center">
           <p className="text-lg">
-            AMS College has been a beacon of excellence for over 25 years, nurturing young minds into future leaders.
-            Our vision is to empower students with practical knowledge and ethical values to thrive in today's world.
+            AMS College has been a beacon of excellence for over 25 years,
+            nurturing young minds into future leaders. Our vision is to empower
+            students with practical knowledge and ethical values to thrive in
+            today's world.
           </p>
 
           {/* Professors */}
@@ -124,7 +176,6 @@ function HomePage() {
       <section id="contact" className="py-20 bg-gray-100">
         <h2 className="text-4xl font-bold text-center mb-10">Contact Us</h2>
         <div className="max-w-4xl mx-auto space-y-6 text-center text-lg text-gray-700">
-          
           <div className="flex flex-col items-center space-y-2">
             <FaEnvelope className="text-3xl" />
             <p>amscollege@example.com</p>
@@ -136,20 +187,33 @@ function HomePage() {
           </div>
 
           <div className="flex justify-center space-x-6 text-3xl mt-6">
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500">
+            <a
+              href="https://instagram.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-pink-500"
+            >
               <FaInstagram />
             </a>
-            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400">
+            <a
+              href="https://twitter.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-blue-400"
+            >
               <FaTwitter />
             </a>
-            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600">
+            <a
+              href="https://facebook.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-blue-600"
+            >
               <FaFacebook />
             </a>
           </div>
-
         </div>
       </section>
-
     </div>
   );
 }

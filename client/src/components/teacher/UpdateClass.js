@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ToastContainer, toast } from "react-toastify";
+import {  toast } from "react-toastify";
 
 function UpdateClass() {
   const [subjectName, setSubjectName] = useState('');
@@ -40,7 +40,7 @@ function UpdateClass() {
       } else {
         toast.error("something went wrong");
       }
-      console.log("error occur in the deleting student data");
+      console.log("error occur in the update class");
 
 
     }
@@ -101,7 +101,7 @@ function UpdateClass() {
           </div>
         </form>
       </div>
-      <ToastContainer /> 
+      
     </div>
   );
 }

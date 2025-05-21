@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 
 function Profile() {
   const [user, setUser] = useState({});
@@ -59,7 +59,7 @@ function Profile() {
       } else {
         toast.error("something went wrong");
       }
-      console.log("error occur in the deleting student data");
+      console.log("error occur in the profile update");
     }
   };
 
@@ -69,7 +69,7 @@ function Profile() {
         {/* Profile Image */}
         <div className="flex flex-col items-center">
           <img
-            src={user.profile || "https://via.placeholder.com/150"}
+            src={user.profile || "/images/profilephoto2.jpg"}
             alt="Profile"
             className="w-40 h-40 rounded-full object-cover border-4 border-green-500 shadow-md"
           />
@@ -117,7 +117,7 @@ function Profile() {
           </div>
         </div>
       </div>
-      <ToastContainer /> 
+      
     </div>
   );
 }

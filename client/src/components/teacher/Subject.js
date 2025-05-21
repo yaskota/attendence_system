@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 
 function Subject() {
   const [subjectName, setSubjectName] = useState('');
@@ -21,6 +21,7 @@ function Subject() {
       const res = await axios.post('http://localhost:8080/api/class/create', classdata, {
         withCredentials: true,
       });
+      console.log(res.data)
       toast.success(res.data.message);
       setTimeout(() => {
         navigate('/teachermain');
@@ -31,7 +32,7 @@ function Subject() {
       } else {
         toast.error("something went wrong");
       }
-      console.log("error occur in the deleting student data");
+      console.log("error occur in the create class");
 
 
     }
@@ -92,7 +93,7 @@ function Subject() {
           </div>
         </form>
       </div>
-      <ToastContainer /> 
+      
     </div>
   );
 }

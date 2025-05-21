@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useState } from "react";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
+import {  toast } from "react-toastify";
 
 function ResetPassword() {
   const navigate = useNavigate();
@@ -37,7 +37,7 @@ function ResetPassword() {
       } else {
         toast.error("something went wrong");
       }
-      console.log("error occur in the deleting student data");
+      console.log("error occur in reset password");
     }
 
     // Handle reset password logic here
@@ -124,7 +124,7 @@ function ResetPassword() {
           </button>
         </form>
       </div>
-      <ToastContainer /> 
+      
     </div>
   );
 }

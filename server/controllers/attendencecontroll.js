@@ -13,7 +13,7 @@ const isToday = (date) => {
   };
 
 export const attend = async (req, res) => {
-    const { rollNo, USER_ID, subject, branch, periods,startTime,endTime} = req.body;
+    const { rollNo, USER_ID,start_year, subject, branch, periods,startTime,endTime} = req.body;
     if (!rollNo || !USER_ID || !subject || !branch || !periods || !startTime ||!endTime) {
         return res.status(400).send({ message: "data is missing" });
     }
@@ -26,6 +26,11 @@ export const attend = async (req, res) => {
         }
         if (user.branch !== branch) {
             return res.status(400).send({ message: "branch mismatch" });
+        }
+
+        if(user.start_year!==start_year)
+        {
+          return res.status(400).send({ message: "Year mismatch" });
         }
 
         const teach = await teachermodel.findById(USER_ID);
@@ -80,13 +85,12 @@ export const attend = async (req, res) => {
             }
         );
 
-        return res.status(201).send({ message: "attendance updated successfully" });
+        return res.status(201).send({ message: `${user.name} is attended` });
 
     } catch (error) {
         return res.status(500).send({ message: "error in student attendance", error });
     }
 }
-
 
 export const getattendToday = async (req, res) => {
     const { start_year, branch, subject, startTime, endTime } = req.body;
@@ -171,8 +175,6 @@ export const getattendToday = async (req, res) => {
     }
   };
   
-
-
   export const completed = async (req, res) => {
     const { start_year, subject, branch, startTime, endTime } = req.body;
   
@@ -209,6 +211,10 @@ export const rollFilter=async(req,res)=>{
     const { rollNo } = req.body;
 
   try {
+    if(!rollNo)
+    {
+      return res.status(404).json({ message: 'Data missing' });
+    }
     const records = await attendencemodel.find({ rollNo });
 
     if (records.length === 0) {
@@ -253,14 +259,18 @@ export const rollFilter=async(req,res)=>{
   }
 }
 
-export const attendencefilter=async(req,res)=>{
-    const { start_year, subject, branch } = req.body;
+export const attendencefilter = async (req, res) => {
+  const { start_year, subject, branch } = req.body;
 
   try {
+    if (!start_year || !subject || !branch) {
+      return res.status(404).json({ message: 'Data Missing' });
+    }
+
     const records = await attendencemodel.find({
       start_year,
-      subject,
-      branch,
+      subject: subject.toUpperCase(),
+      branch: branch.toUpperCase(),
     });
 
     if (!records.length) {
@@ -271,7 +281,7 @@ export const attendencefilter=async(req,res)=>{
     const studentMap = {};
 
     records.forEach(record => {
-      const { rollNo, studentname, totalhour, counthour ,teachername} = record;
+      const { rollNo, studentname, totalhour, counthour, teachername } = record;
 
       if (!studentMap[rollNo]) {
         studentMap[rollNo] = {
@@ -295,9 +305,12 @@ export const attendencefilter=async(req,res)=>{
         : '0.00',
     }));
 
+    // Sort by rollNo in ascending order
+    result.sort((a, b) => a.rollNo.localeCompare(b.rollNo));
+
     res.json(result);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server Error' });
   }
-}
+};

@@ -1,16 +1,20 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
+import {  toast } from "react-toastify";
+import { useLocation } from "react-router-dom";
 
 function Otp() {
   const [otp, setOtp] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
+  const email = location.state?.email;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const user = {
+        email,
         OTP: otp,
       };
       console.log(otp);
@@ -31,7 +35,7 @@ function Otp() {
       } else {
         toast.error("something went wrong");
       }
-      console.log("error occur in the deleting student data");
+      console.log("error occur in the otp verification");
     }
   };
 
@@ -74,7 +78,7 @@ function Otp() {
           </button>
         </form>
       </div>
-      <ToastContainer /> 
+      
     </div>
   );
 }
