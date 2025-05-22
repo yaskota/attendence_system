@@ -18,12 +18,12 @@ function Faculty() {
       <div className="flex-1 flex flex-col justify-center items-center p-10 text-center md:text-left bg-white">
         <div className="max-w-xl">
           <h1 className="text-5xl font-extrabold text-indigo-700 mb-6">
-            Empower the Future with Us
-          </h1>
-          <p className="text-lg text-gray-600 mb-8">
-            Become part of a vibrant faculty community that inspires, educates, and shapes tomorrow's leaders.
-            Join us and make a meaningful impact through your knowledge and experience.
-          </p>
+  Empower the Future with Us
+</h1>
+<p className="text-lg text-gray-600 mb-8">
+  As a faculty member, you can efficiently record and monitor student attendance, ensuring accuracy and accountability. Join us in fostering a culture of discipline and academic excellence.
+</p>
+
           <button
             className="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-4 rounded-xl text-lg transition-all"
             onClick={() => navigate('/teacherlogin')} // 👈 fallback login
@@ -36,7 +36,7 @@ function Faculty() {
       {/* Right Section - Image */}
       <div className="flex-1 flex items-center justify-center p-4 bg-white">
         <img
-          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzTv8HlyB2tPmjxyLyl4mQqC6xzBzAmThYLw&s"
+          src="/images/fornt.jpg"
           alt="Faculty"
           className="w-full max-w-md rounded-2xl shadow-lg object-cover"
         />

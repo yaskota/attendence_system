@@ -18,10 +18,10 @@ function Student() {
       {/* Left Content */}
       <div className="flex-1 text-center md:text-left space-y-6">
         <h1 className="text-5xl font-bold text-indigo-700">Welcome Students</h1>
-        <p className="text-lg text-gray-700">
-          Unlock your potential with AMS College. Dive into a world of knowledge, innovation, and opportunity.
-          Start your journey toward excellence today!
-        </p>
+<p className="text-lg text-gray-700">
+  Access your personal profile and attendance records easily with AMS. Stay informed, track your progress, and take charge of your academic journey.
+</p>
+
         <button
           onClick={() => navigate('/studentlogin')}
           className="mt-6 bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-lg text-lg transition-all"
@@ -33,7 +33,7 @@ function Student() {
       {/* Right Image */}
       <div className="flex-1 flex justify-center mt-10 md:mt-0">
         <img
-          src="https://images.unsplash.com/photo-1596495577886-d920f1fb7238?auto=format&fit=crop&w=800&q=80"
+          src="/images/front2.jpg"
           alt="Student Learning"
           className="w-full max-w-md rounded-3xl shadow-lg object-cover"
         />

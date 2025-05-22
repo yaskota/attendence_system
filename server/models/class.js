@@ -10,7 +10,6 @@ const classSchema=new mongoose.Schema({
         type:String,
         required:true
     },
-    
     branch:{
         type:String,
         required:true

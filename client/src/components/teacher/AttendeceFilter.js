@@ -185,6 +185,7 @@ function AttendanceFilter() {
               <thead>
                 <tr className="bg-indigo-100">
                   <th className="px-4 py-2 border">Subject</th>
+                  
                   <th className="px-4 py-2 border">Faculty</th>
                   <th className="px-4 py-2 border">Attendance %</th>
                 </tr>
@@ -193,6 +194,7 @@ function AttendanceFilter() {
                 {filteredData.map((item, idx) => (
                   <tr key={idx} className="text-center border-b">
                     <td className="px-4 py-2 border">{item.subject}</td>
+                    
                     <td className="px-4 py-2 border">{item.teachername}</td>
                     <td className="px-4 py-2 border">
                       {item.attendancePercentage}%
