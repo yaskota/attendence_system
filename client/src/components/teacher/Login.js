@@ -25,6 +25,7 @@ function Login() {
       });
 
       toast.success(res.data.message);
+      
       const { userRole, user } = res.data;
       setUser(user);
       setUserRole(userRole);

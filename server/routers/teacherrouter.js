@@ -1,5 +1,5 @@
 import express from 'express'
-import { delete_unverify_teachers, is_Authenticated, login, logout, otp_Send, profileupdate, register, resendOtp, resetpassword, teacherdetails, verify_Email } from '../controllers/authteacher.js';
+import { delete_unverify_teachers, deleteById, detailsById, is_Authenticated, login, logout, otp_Send, profileupdate, register, resendOtp, resetpassword, teacherdetails, verify_Email } from '../controllers/authteacher.js';
 import userAuth from '../middleware/userauth.js';
 import multer from "multer";
 import { validateLogin, validateregister, validateSignup } from '../middleware/validate.js';
@@ -20,5 +20,7 @@ teacherrouter.post('/resetpassword',resetpassword);
 teacherrouter.post('/profileupdate',upload.single("photo"),userAuth,profileupdate);
 teacherrouter.get('/teacherdetails',userAuth,teacherdetails);
 teacherrouter.delete('/deleteunverifiedteachers',delete_unverify_teachers)
+teacherrouter.post('/detailsById',userAuth, detailsById);
+teacherrouter.delete('/deleteById/:id',deleteById);
 
 export default teacherrouter;

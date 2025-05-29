@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
+
+
 
 function StudentMain() {
   const [student, setStudent] = useState({});
@@ -7,6 +10,22 @@ function StudentMain() {
   const [expandedCards, setExpandedCards] = useState([]);
 
   // ✅ Correct useEffect syntax - avoid using async directly
+  const {setUser}=useAuth()
+  
+  // const getUser=async()=>{
+  //   try {
+  //     const url=`${process.env.REACT_APP_API_URL}/api/authstudent/login/success`;
+  //     const {data}=await axios.get(url,{withCredentials:true })
+  //     setUser(data.user.json)
+  //     console.log(data.user.json)
+  //   } catch (error) {
+  //     console.log(error)
+  //   }
+  // }
+  // useEffect(()=>{
+  //   getUser();
+  // },[])
+
   useEffect(() => {
     const fetchStudent = async () => {
       try {

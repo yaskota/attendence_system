@@ -83,7 +83,7 @@ function HomePage() {
           {/* CSE */}
           <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition">
             <img
-              src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=800&q=80"
+              src="/images/ml2.jpg"
               alt="CSE Branch"
               className="w-full h-48 object-cover rounded-md mb-4"
             />

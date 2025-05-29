@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useCallback } from "react";
-
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -60,7 +59,7 @@ function Attendence() {
             prev.includes(msg.deviceId) ? prev : [...prev, msg.deviceId]
           );
         }
-
+        
         if (msg.type === "rfidScan") {
           const exists = attendanceList.find((s) => s.rollNo === msg.rollNo);
           if (!exists) {
@@ -101,7 +100,8 @@ function Attendence() {
     };
 
     return () => socket.close();
-  }, [attendanceList, classDetails, endTime, handledata, periods, startTime]);
+  }, [attendanceList]);
+  
 
   const handlePair = (deviceId) => {
     setPairedDevice(deviceId);
@@ -138,6 +138,7 @@ function Attendence() {
         { withCredentials: true }
       );
       toast.success(res.data.message);
+      
       handledata();
     } catch (error) {
       if (error.response) {

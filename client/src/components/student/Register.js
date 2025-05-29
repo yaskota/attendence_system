@@ -55,6 +55,7 @@ function Register() {
       );
       console.log("cc");
       toast.success(res.data.message);
+      toast.success(res.data.msg);
       setTimeout(() => {
         navigate("/studentotp", { state: { email } });
       }, 2000);

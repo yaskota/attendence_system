@@ -29,6 +29,7 @@ function Register() {
       });
 
       toast.success(res.data.message);
+      toast.success(res.data.msg);
       setTimeout(() => {
         navigate('/teacherotp' ,  { state: { email } });
       }, 2000);

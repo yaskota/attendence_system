@@ -24,14 +24,22 @@ import UpdateClass from './components/teacher/UpdateClass.js';
 import Profile from './components/student/Profile.js';
 import ALogin from './components/Admin/Login.js';
 import Main from './components/Admin/Main.js';
+import AEmail from './components/Admin/Email.js';
+import AResetPassword from './components/Admin/ResetPassword.js';
 import TProfile from './components/teacher/Profile.js';
+import AProfile from './components/Admin/Profile.js';
 
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider} from './context/AuthContext';
 
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
+
+
 function App() {
+
+
+
   return (
     <BrowserRouter>
       <AuthProvider>
@@ -70,8 +78,10 @@ function App() {
           <Route path="/studentprofile" element={<Profile/>}/>
           <Route path="/adminlogin" element={<ALogin/>}/>
           <Route path="/adminmain" element={<Main/>}/>
+          <Route path="/adminemail" element={<AEmail/>}/>
+          <Route path="/adminresetpassword" element={<AResetPassword/>}/>
           <Route path="/teacherprofile" element={<TProfile/>}/>
-
+          <Route path="/adminprofile" element={<AProfile/>}/>
         </Routes>
         </AuthProvider>
     </BrowserRouter>  

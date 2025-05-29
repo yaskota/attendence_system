@@ -8,6 +8,7 @@ import attendencemodel from "../models/attendence.js";
 import teachermodel from "../models/teacher.js";
 import verifyOtpTemp from "../utils/verifyOtpTemp.js";
 import resetPasswordTemp from "../utils/resetPasswordTemp.js";
+import adminmodel from "../models/admin.js";
 
 export const register = async (req, res) => {
   const { name, rollNo, start_year, email, password, phno, branch } = req.body;
@@ -53,18 +54,21 @@ export const register = async (req, res) => {
     const User = new studentmodel(newstudent);
     await User.save();
 
-    
-
     const verificationMail = {
       from: process.env.SENDER_EMAIL,
       to: email,
       subject: "welcome to JNTU sulthanpur",
-      html: verifyOtpTemp(name,email,otp) 
+      html: verifyOtpTemp(name, email, otp),
     };
 
     await transporter.sendMail(verificationMail);
 
-    return res.status(201).send({ message: "register succesfullly" });
+    return res
+      .status(201)
+      .send({
+        message: "register succesfullly",
+        msg: "otp sent to your email",
+      });
   } catch (error) {
     console.error({ message: "error occur in signup", error });
   }
@@ -99,7 +103,9 @@ export const login = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    return res.status(200).send({ message: "login succesfully",userRole:"student",user });
+    return res
+      .status(200)
+      .send({ message: "login succesfully", userRole: "student", user });
   } catch (error) {
     console.error({ message: "error in login_page", error });
     console.log("error in login page");
@@ -137,7 +143,7 @@ export const otp_Send = async (req, res) => {
     const otp = String(Math.floor(10000 + Math.random() * 90000));
 
     const email = user.email;
-    const name= user.name;
+    const name = user.name;
 
     user.otp = otp;
     user.otp_expiry_time = Date.now() + 5 * 60 * 1000;
@@ -148,7 +154,7 @@ export const otp_Send = async (req, res) => {
       from: process.env.SENDER_EMAIL,
       to: email,
       subject: "Account verification OTP",
-      html: resetPasswordTemp(name,email,otp) 
+      html: resetPasswordTemp(name, email, otp),
     };
 
     await transporter.sendMail(otpEmail);
@@ -164,7 +170,7 @@ export const verify_Email = async (req, res) => {
   try {
     const { email, OTP } = req.body;
 
-    const user = await studentmodel.findOne({email});
+    const user = await studentmodel.findOne({ email });
 
     console.log(user);
 
@@ -211,7 +217,7 @@ export const resendOtp = async (req, res) => {
     }
     const otp = String(Math.floor(10000 + Math.random() * 90000));
 
-    const name =user.name;
+    const name = user.name;
     user.resendotp = otp;
     user.resend_otp_expiry_time = Date.now() + 10 * 60 * 1000;
     await user.save();
@@ -220,7 +226,7 @@ export const resendOtp = async (req, res) => {
       from: process.env.SENDER_EMAIL,
       to: email,
       subject: "reset password",
-      html: resetPasswordTemp(name,email,otp) 
+      html: resetPasswordTemp(name, email, otp),
     };
 
     await transporter.sendMail(resend_email);
@@ -274,12 +280,10 @@ export const delete_unverify_students = async (req, res) => {
     return res.status(400).send({ message: "Unverified students deleted" });
   } catch (error) {
     console.log(error.data);
-    return res
-      .status(401)
-      .send({
-        message: "error occur in delete unverified student deletion",
-        error,
-      });
+    return res.status(401).send({
+      message: "error occur in delete unverified student deletion",
+      error,
+    });
   }
 };
 
@@ -310,114 +314,178 @@ export const profileupdate = async (req, res) => {
 
       user.profile = result.secure_url;
       await user.save();
-      return res.status(200).send({ user, message: "profile update successfully" });
+      return res
+        .status(200)
+        .send({ user, message: "profile update successfully" });
     }
   );
 
   uploadStream.end(req.file.buffer);
 };
 
-
 export const studentattendencedetails = async (req, res) => {
-    const { USER_ID } = req.body;
-    try {
-      if (!USER_ID) {
-        return res.status(400).send({ message: "User ID not found" });
-      }
-  
-      const user = await studentmodel.findById(USER_ID);
-      if (!user) {
-        return res.status(404).send({ message: "User not found" });
-      }
-  
-      const { rollNo } = user;
-  
-      const records = await attendencemodel.find({ rollNo });
-  
-      if (records.length === 0) {
-        return res.status(404).json({ message: "No records found for this roll number." });
-      }
-  
-      // Group by subject
-      const subjectMap = {};
-  
-      records.forEach(record => {
-        const { subject, counthour, totalhour, studentname, branch, start_year, teachername, timestamp } = record;
-  
-        if (!subjectMap[subject]) {
-          subjectMap[subject] = {
-            subject,
-            counthour: 0,
-            totalhour: 0,
-            studentname,
-            rollNo,
-            branch,
-            start_year,
-            teachername,
-            timestamp, // latest timestamp if needed
-          };
-        }
-  
-        subjectMap[subject].counthour += counthour;
-        subjectMap[subject].totalhour += totalhour;
-        subjectMap[subject].timestamp = timestamp; // overwrites, will be the latest if records are sorted
-      });
-  
-      const result = Object.values(subjectMap).map(item => ({
-        ...item,
-        attendancePercentage: item.totalhour
-          ? ((item.counthour / item.totalhour) * 100).toFixed(2)
-          : "0.00",
-      }));
-  
-      return res.status(200).send(result);
-    } catch (error) {
-      return res.status(500).send({
-        message: "Error occurred in get student attendece details",
-        error: error.message,
-      });
+  const { USER_ID } = req.body;
+  try {
+    if (!USER_ID) {
+      return res.status(400).send({ message: "User ID not found" });
     }
-  };
-  
-  export const studentdetails=async(req,res)=>{
-    const {USER_ID}=req.body
-    try {
-        if (!USER_ID) {
-            return res.status(400).send({ message: "User ID not found" });
-          }
-      
-          const user = await studentmodel.findById(USER_ID);
-          if (!user) {
-            return res.status(404).send({ message: "User not found" });
-          }
-          res.status(200).send(user)
-    } catch (error) {
-        console.log('error occur in get student details')
-    }
-  }
 
-  export const details = async (req, res) => {
-    const { USER_ID } = req.body;
-  
-    try {
-      if (!USER_ID) {
-        return res.status(400).json({ message: "User ID is missing" });
-      }
-  
-      let user = await studentmodel.findById(USER_ID);
-      if (user) {
-        return res.status(200).json({ message: "Student found", userRole: "student", user });
-      }
-  
-      user = await teachermodel.findById(USER_ID);
-      if (user) {
-        return res.status(200).json({ message: "Faculty found", userRole: "faculty", user });
-      }
-  
-      return res.status(404).json({ message: "User not found" });
-    } catch (error) {
-      console.error("Error in details:", error);
-      return res.status(500).json({ message: "Internal server error" });
+    const user = await studentmodel.findById(USER_ID);
+    if (!user) {
+      return res.status(404).send({ message: "User not found" });
     }
-  };
-  
+
+    const { rollNo } = user;
+
+    const records = await attendencemodel.find({ rollNo });
+
+    if (records.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No records found for this roll number." });
+    }
+
+    // Group by subject
+    const subjectMap = {};
+
+    records.forEach((record) => {
+      const {
+        subject,
+        counthour,
+        totalhour,
+        studentname,
+        branch,
+        start_year,
+        teachername,
+        timestamp,
+      } = record;
+
+      if (!subjectMap[subject]) {
+        subjectMap[subject] = {
+          subject,
+          counthour: 0,
+          totalhour: 0,
+          studentname,
+          rollNo,
+          branch,
+          start_year,
+          teachername,
+          timestamp, // latest timestamp if needed
+        };
+      }
+
+      subjectMap[subject].counthour += counthour;
+      subjectMap[subject].totalhour += totalhour;
+      subjectMap[subject].timestamp = timestamp; // overwrites, will be the latest if records are sorted
+    });
+
+    const result = Object.values(subjectMap).map((item) => ({
+      ...item,
+      attendancePercentage: item.totalhour
+        ? ((item.counthour / item.totalhour) * 100).toFixed(2)
+        : "0.00",
+    }));
+
+    return res.status(200).send(result);
+  } catch (error) {
+    return res.status(500).send({
+      message: "Error occurred in get student attendece details",
+      error: error.message,
+    });
+  }
+};
+
+export const studentdetails = async (req, res) => {
+  const { USER_ID } = req.body;
+  try {
+    if (!USER_ID) {
+      return res.status(400).send({ message: "User ID not found" });
+    }
+
+    const user = await studentmodel.findById(USER_ID);
+    if (!user) {
+      return res.status(404).send({ message: "User not found" });
+    }
+    res.status(200).send(user);
+  } catch (error) {
+    console.log("error occur in get student details");
+  }
+};
+
+export const details = async (req, res) => {
+  const { USER_ID } = req.body;
+
+  try {
+    if (!USER_ID) {
+      return res.status(400).json({ message: "User ID is missing" });
+    }
+
+    let user = await studentmodel.findById(USER_ID);
+    if (user) {
+      return res
+        .status(200)
+        .json({ message: "Student found", userRole: "student", user });
+    }
+
+    user = await teachermodel.findById(USER_ID);
+    if (user) {
+      return res
+        .status(200)
+        .json({ message: "Faculty found", userRole: "faculty", user });
+    }
+
+    user = await adminmodel.findById(USER_ID);
+    if (user) {
+      return res
+        .status(200)
+        .json({ message: "Admin found", userRole: "admin", user });
+    }
+
+    return res.status(404).json({ message: "User not found" });
+  } catch (error) {
+    console.error("Error in details:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const detailsByRollNO = async (req,res) => {
+  const { rollNo, USER_ID } = req.body;
+  try {
+    
+    if (!USER_ID) {
+      return res.status(400).json({ message: "User ID is missing" });
+    }
+
+    let user = await adminmodel.findById(USER_ID);
+    if (!user) {
+      return res.status(200).json({ message: "you have no access" });
+    }
+    if (!rollNo) {
+      return res.status(404).json({ message: "Data Missing" });
+    }
+    user = await studentmodel.findOne({ rollNo });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    return res.status(200).json(user);
+  } catch (error) {
+    console.error("Error in details:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const deleteById = async (req,res) => {
+  const ID = req.params.id;
+  try {
+    
+    if (!ID) {
+      return res.status(404).json({ message: "ID not found" });
+    }
+    let user= await studentmodel.findOne({rollNo:ID});
+     user = await studentmodel.findByIdAndDelete(user._id);
+    return res.status(200).json({ message: "student removed" });
+  } catch (error) {
+    console.error("Error in details:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};

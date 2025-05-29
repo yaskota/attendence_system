@@ -5,7 +5,7 @@ import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom"; // <== import navigate
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
-import {  toast } from "react-toastify";
+import {  toast } from "react-toastify"
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -29,6 +29,7 @@ function Login() {
         }
       );
       toast.success(res.data.message);
+      
       const { userRole, user } = res.data;
       setUser(user);
       setUserRole(userRole);
@@ -46,9 +47,12 @@ function Login() {
   };
 
   const handleGoogleSignIn = () => {
-    console.log("Google Sign In Clicked");
-    // Add Google Sign-In logic here!
+    // window.open(
+    //     `${process.env.REACT_APP_API_URL}/api/authstudent/google/callback`,"_self"
+    //   )
   };
+
+  
 
   const goToRegister = () => {
     navigate("/studentregister"); // Navigate to register page

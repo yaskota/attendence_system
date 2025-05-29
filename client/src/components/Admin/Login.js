@@ -1,37 +1,41 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import { FiEye, FiEyeOff } from "react-icons/fi"; // 👈 Import eye icons
+import { useAuth } from "../../context/AuthContext";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // 👈 New state
   const navigate = useNavigate();
+    const {user, setUser, setUserRole } = useAuth();
+
+    useEffect(()=>{
+      if(user)
+      {
+        navigate('/adminmain')
+      }
+    },[])
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const Data = {
-        email,
-        password,
-      };
+      const Data = { email, password };
       const res = await axios.post(
         "http://localhost:8080/api/admin/login",
         Data,
         { withCredentials: true }
       );
-      console.log(res.data.message);
       toast.success(res.data.message);
-      setTimeout(() => {
-        navigate("/adminmain");
-      }, 2000);
+      const { userRole, user } = res.data;
+      setUser(user);
+      setUserRole(userRole);
+      setTimeout(() => navigate("/adminmain"), 2000);
     } catch (error) {
-      if (error.response) {
-        toast.error(error.response.data.message);
-      } else {
-        toast.error("something went wrong");
-      }
-      console.log("error occur in the admin login");
+      toast.error(error.response?.data?.message || "Something went wrong");
+      console.log("Error occurred in the admin login");
     }
   };
 
@@ -43,9 +47,7 @@ function Login() {
         </h2>
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="block text-gray-700 font-medium mb-1">
-              Email
-            </label>
+            <label className="block text-gray-700 font-medium mb-1">Email</label>
             <input
               type="email"
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
@@ -56,18 +58,31 @@ function Login() {
             />
           </div>
 
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">
-              Password
-            </label>
+          <div className="relative">
+            <label className="block text-gray-700 font-medium mb-1">Password</label>
             <input
-              type="password"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              type={showPassword ? "text" : "password"}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 pr-10"
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+            <div
+              className="absolute right-3 top-[38px] cursor-pointer text-gray-500"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <FiEyeOff /> : <FiEye />}
+            </div>
+          </div>
+
+          <div className="text-right">
+            <Link
+              to="/adminemail"
+              className="text-sm text-indigo-600 hover:underline"
+            >
+              Forgot Password?
+            </Link>
           </div>
 
           <button

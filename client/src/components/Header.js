@@ -28,8 +28,11 @@ function Header() {
     
     if (userRole === 'student') {
       navigate('/studentprofile');
-    } else {
+    } else if(userRole === 'faculty') {
       navigate('/teacherprofile');
+    }
+    else{
+      navigate('/adminprofile');
     }
     
   }

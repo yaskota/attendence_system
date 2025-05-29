@@ -57,8 +57,14 @@ function ResetPassword() {
         }
       );
       console.log(res.data.message);
+      toast.success(res.data.message);
     } catch (error) {
-      console.log("error occur in resendotp");
+      if (error.response) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("something went wrong");
+      }
+      console.log("error occur in resend otp");
     }
   };
 
