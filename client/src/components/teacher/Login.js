@@ -42,6 +42,10 @@ function Login() {
     }
   };
 
+   const handleGoogleSignIn = () => {
+    window.open("http://localhost:8080/auth/google", "_self");
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-300 via-green-200 to-yellow-300 p-6">
       <div className="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-md mt-20">
@@ -107,7 +111,7 @@ function Login() {
 
         {/* Sign in with Google */}
         <div className="mt-6 text-center">
-          <button className="w-full flex items-center justify-center gap-3 border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-100 transition text-lg font-semibold">
+          <button onClick={handleGoogleSignIn} className="w-full flex items-center justify-center gap-3 border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-100 transition text-lg font-semibold">
             <FcGoogle className="text-2xl" /> 
             Sign in with Google
           </button>

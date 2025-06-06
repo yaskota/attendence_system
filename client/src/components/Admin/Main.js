@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 function Main() {
   const [teacherId, setTeacherId] = useState("");
@@ -9,6 +11,50 @@ function Main() {
   const [studentRoll, setStudentRoll] = useState("");
   const [studentData, setStudentData] = useState(null);
   const [searchTeacherId, setSearchTeacherId] = useState("");
+ 
+  const navigate=useNavigate()
+  const { user, setUser, setUserRole } = useAuth();
+  const [loading, setLoading] = useState(true); // ✅ loading control
+
+  // ✅ Step 1: Get user profile
+  useEffect(() => {
+  const getData = async () => {
+    try {
+      const res = await axios.get('http://localhost:8080/auth/profile', {
+        withCredentials: true,
+      });
+
+      const fetchedUser = res.data;
+      console.log("Fetched user:", fetchedUser);
+
+      // Check directly before setting state
+      if (!fetchedUser || Object.keys(fetchedUser).length === 0) {
+        navigate("/");
+        return;
+      }
+
+      // If valid user
+      setUser(fetchedUser);
+      setUserRole("admin");
+    } catch (err) {
+      console.error("Error fetching profile", err);
+      navigate("/"); // redirect on error
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  getData();
+}, []);
+
+  // ✅ Step 2: Redirect if user is null
+  useEffect(() => {
+    console.log("navigate")
+    if (!loading && user === null) {
+      navigate("/");
+    }
+  }, [loading, user]);
+
 
   const handleTeacherSubmit = async (e) => {
     e.preventDefault();

@@ -47,9 +47,7 @@ function Login() {
   };
 
   const handleGoogleSignIn = () => {
-    // window.open(
-    //     `${process.env.REACT_APP_API_URL}/api/authstudent/google/callback`,"_self"
-    //   )
+    window.open("http://localhost:8080/auth/google", "_self");
   };
 
   

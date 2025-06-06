@@ -104,7 +104,7 @@ function HomePage() {
               alt="CSM Branch"
               className="w-full h-48 object-cover rounded-md mb-4"
             />
-            <h3 className="text-2xl font-semibold mb-2">CSM</h3>
+            <h3 className="text-2xl font-semibold mb-2">CSE-AI & ML</h3>
             <p>
               Computer Science & Machine Learning is all about AI, data science,
               and modern intelligent systems.
@@ -117,14 +117,13 @@ function HomePage() {
           {/* MECH */}
           <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition">
             <img
-              src="/images/mech.jpg"
+              src="/images/cyber.jpg"
               alt="MECH Branch"
               className="w-full h-48 object-cover rounded-md mb-4"
             />
-            <h3 className="text-2xl font-semibold mb-2">MECH</h3>
+            <h3 className="text-2xl font-semibold mb-2">CSE-CS</h3>
             <p>
-              Mechanical Engineering shapes industries with expertise in design,
-              materials, and mechanics.
+              Cybersecurity safeguards digital infrastructure through expertise in networks, encryption, and threat prevention.
               <span className="text-blue-500 cursor-pointer ml-2">
                 Some more...
               </span>

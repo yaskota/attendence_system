@@ -1,7 +1,10 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import html2pdf from "html2pdf.js";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+
 
 function AttendanceFilter() {
   const [startYear, setStartYear] = useState("");
@@ -11,6 +14,19 @@ function AttendanceFilter() {
   const [filteredData, setFilteredData] = useState([]);
   const [filterType, setFilterType] = useState("");
   const reportRef = useRef(null);
+  const {user}=useAuth();
+  const navigate=useNavigate()
+  
+
+  useEffect(()=>{
+      const isTrue=async()=>{
+        if(user===null)
+        {
+          navigate('/')
+        }
+      }
+      isTrue();
+    },[])
 
   const handleSubmit = (type) => async (e) => {
     e.preventDefault();

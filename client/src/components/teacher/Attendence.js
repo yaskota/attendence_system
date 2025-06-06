@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useAuth } from "../../context/AuthContext";
 
 function Attendence() {
   const [rollNo, setRollNo] = useState("");
@@ -17,6 +18,22 @@ function Attendence() {
   const navigate = useNavigate();
   const location = useLocation();
   const { classDetails } = location.state;
+
+  const {user}=useAuth();
+   
+    
+  
+    useEffect(()=>{
+        const isTrue=async()=>{
+          if(user===null)
+          {
+            navigate('/')
+          }
+        }
+        isTrue();
+      },[])
+
+  
 
   const handledata = useCallback(async () => {
     try {

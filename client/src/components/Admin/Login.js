@@ -2,22 +2,22 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
-import { FiEye, FiEyeOff } from "react-icons/fi"; // 👈 Import eye icons
+import { FiEye, FiEyeOff } from "react-icons/fi";
+import { FcGoogle } from "react-icons/fc"; // 👈 Google icon
 import { useAuth } from "../../context/AuthContext";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // 👈 New state
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-    const {user, setUser, setUserRole } = useAuth();
+  const { user, setUser, setUserRole, userRole } = useAuth();
 
-    useEffect(()=>{
-      if(user)
-      {
-        navigate('/adminmain')
-      }
-    },[])
+  useEffect(() => {
+    if (user && userRole === "admin") {
+      navigate("/adminmain");
+    }
+  }, [user, userRole, navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -37,6 +37,10 @@ function Login() {
       toast.error(error.response?.data?.message || "Something went wrong");
       console.log("Error occurred in the admin login");
     }
+  };
+
+  const handleGoogleSignIn = () => {
+    window.open("http://localhost:8080/auth/google", "_self");
   };
 
   return (
@@ -85,12 +89,22 @@ function Login() {
             </Link>
           </div>
 
-          <button
-            type="submit"
-            className="w-full bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-700 transition duration-200"
-          >
-            Login
-          </button>
+          <div className="space-y-3">
+            <button
+              type="submit"
+              className="w-full bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-700 transition duration-200"
+            >
+              Login
+            </button>
+
+            <button
+              onClick={handleGoogleSignIn}
+              className="w-full flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-100 transition duration-200"
+            >
+              <FcGoogle className="text-xl" />
+              Sign in with Google
+            </button>
+          </div>
         </form>
       </div>
     </div>

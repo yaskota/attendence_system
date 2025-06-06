@@ -1,13 +1,27 @@
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from "react-toastify";
+import { useAuth } from '../../context/AuthContext';
 
 function Subject() {
   const [subjectName, setSubjectName] = useState('');
   const [branch, setBranch] = useState('');
   const [startYear, setStartYear] = useState('');
   const navigate = useNavigate();
+  const {user}=useAuth();
+    
+    
+  
+    useEffect(()=>{
+        const isTrue=async()=>{
+          if(user===null)
+          {
+            navigate('/')
+          }
+        }
+        isTrue();
+      },[])
 
   const handleSubmit = async (e) => {
     e.preventDefault();
